@@ -1,6 +1,8 @@
 package com.tube_hunter.frontend
 
+import android.content.Intent
 import android.os.Bundle
+import android.os.Looper
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -27,9 +29,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.os.postDelayed
+import androidx.lifecycle.lifecycleScope
 import com.tube_hunter.frontend.ui.theme.FrontendTheme
 import com.tube_hunter.frontend.ui.theme.WhiteFoam
 import com.tube_hunter.frontend.ui.theme.chewy
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,6 +43,13 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             HomeScreen()
+        }
+
+        lifecycleScope.launch {
+            delay(4000)
+            val intent = Intent(this@MainActivity, SpotsListActivity::class.java)
+            startActivity(intent)
+            finish()
         }
     }
 }
