@@ -20,12 +20,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tube_hunter.frontend.ui.theme.WhiteFoam
 import com.tube_hunter.frontend.ui.theme.chewy
+import com.tube_hunter.frontend.ui.theme.quicksand
 
 class SpotsListActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,7 +35,6 @@ class SpotsListActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             BackgroundLoading()
-
         }
     }
 }
@@ -42,7 +43,6 @@ class SpotsListActivity : ComponentActivity() {
 fun BackgroundLoading() {
     Box(
         modifier = Modifier.fillMaxSize(),
-
     ) {
         Image(
             painter = painterResource(id = R.drawable.background_tube_hunter),
@@ -57,19 +57,19 @@ fun BackgroundLoading() {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ){
-
         Text(
             text = "TUBE HUNTER",
             textAlign = TextAlign.Center,
             fontSize = 48.sp,
             fontFamily = chewy,
             color = WhiteFoam,
-            modifier = Modifier.padding(top = 16.dp)
+            modifier = Modifier.padding(top = 48.dp, bottom = 8.dp)
         )
             SpotCard()
+        }
     }
 }
-    }
+
 @Preview
 @Composable
 fun SpotCard() {
@@ -78,22 +78,23 @@ fun SpotCard() {
             containerColor = MaterialTheme.colorScheme.surfaceVariant,
         ),
         modifier = Modifier
-            .size(width = 240.dp, height = 300.dp),
-
+            .size(width = 240.dp, height = 300.dp)
+            .padding(vertical = 0.dp),
     ) {
         Image(
-            painter = painterResource(id = R.drawable.background_tube_hunter),
+            painter = painterResource(id = R.drawable.sunset_wave),
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier.size(width = 240.dp, height = 140.dp)
                 .padding(24.dp),
         )
         Text(
-            text = "Filled",
+            text = "Name of the spot",
             modifier = Modifier
-                .padding(16.dp),
+                .padding(start = 24.dp),
             textAlign = TextAlign.Center,
+            fontFamily = quicksand,
+            fontWeight = FontWeight.Bold,
         )
-
     }
 }
