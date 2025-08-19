@@ -47,7 +47,7 @@ class MainActivity : ComponentActivity() {
 
         lifecycleScope.launch {
             delay(4000)
-            val intent = Intent(this@MainActivity, SpotsListActivity::class.java)
+            val intent = Intent(this@MainActivity, SpotDetailsActivity::class.java)
             startActivity(intent)
             finish()
         }
