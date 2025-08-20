@@ -18,10 +18,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -35,11 +33,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat.startActivity
 import com.tube_hunter.frontend.ui.theme.WhiteFoam
 import com.tube_hunter.frontend.ui.theme.chewy
 import com.tube_hunter.frontend.ui.theme.quicksand
@@ -49,13 +49,14 @@ class SpotsListActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            BackgroundLoading()
+            SpotsList()
         }
     }
 }
+
 @Preview
 @Composable
-fun BackgroundLoading() {
+fun SpotsList() {
     Box(
         modifier = Modifier.fillMaxSize(),
     ) {
@@ -70,38 +71,43 @@ fun BackgroundLoading() {
                 .align(Alignment.Center)
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top
-        ){
-        Text(
-            text = "TUBE HUNTER",
-            textAlign = TextAlign.Center,
-            fontSize = 56.sp,
-            fontFamily = chewy,
-            color = WhiteFoam,
-            modifier = Modifier.padding(top = 48.dp, bottom = 8.dp)
-        )
-            Column (
-                modifier = Modifier
-                    .fillMaxHeight(0.85f)
-                    .wrapContentHeight()
-            ){
-                SpotCard()
-                Spacer(modifier = Modifier.height(24.dp))
-                SpotCard()
-                Spacer(modifier = Modifier.height(24.dp))
-                SpotCard()
+            verticalArrangement = Arrangement.SpaceBetween
+        ) {
+//            BrandTitle()
 
-            }
-            val context = LocalContext.current
+//            Appeler SpotList pour afficher les cartes de Spot, Column doit être fait dans le composant Spotlist
+//            SpotList()
+            SpotCard()
+
+//            !!!!! A SUPPRIMER n'est plus utile avec SpotList !!!!!
+//            Column(
+//                modifier = Modifier
+//                    .fillMaxHeight(0.85f)
+//                    .wrapContentHeight()
+//            ) {
+//                SpotCard()
+//                Spacer(modifier = Modifier.height(24.dp))
+//                SpotCard()
+//                Spacer(modifier = Modifier.height(24.dp))
+//                SpotCard()
+//
+//            }
+
             Button(
-                modifier = Modifier.padding(24.dp),
                 onClick = {
-                    val intent = Intent(context, MainActivity::class.java)
-                    context.startActivity(intent)
+//                     REPRENDRE PROBLEME BOUTON LIEN this@
+//                    val intent = Intent(this@SpotsListActivity, MainActivity::class.java)
+//                    startActivity(intent)
                 },
                 colors = ButtonDefaults.buttonColors(WhiteFoam, Color.Black),
+                modifier = Modifier.padding(bottom = 48.dp),
             ) {
-                Text("Add spot", fontFamily = quicksand, fontWeight = FontWeight.Bold)
+                Text(
+                    "Add spot",
+                    fontFamily = quicksand,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold
+                )
             }
         }
     }
@@ -109,46 +115,57 @@ fun BackgroundLoading() {
 
 @Composable
 fun SpotCard() {
+//    penser à modifier dans SpotDetailsActivity le nom de SpotCard en SpotDetailsCard
     Card(
-        colors = CardDefaults.cardColors(
-            containerColor = WhiteFoam,
-        ),
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 40.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = WhiteFoam,
+        ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 6.dp
+        )
     ) {
-        Column {
+        Column (
+            modifier = Modifier.padding(16.dp),
+            horizontalAlignment = Alignment.Start
+        ) {
             Image(
                 painter = painterResource(id = R.drawable.sunset_wave),
-                contentDescription = null,
+                contentDescription = "Spot Photo",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(8.dp))
                     .height(180.dp)
-                    .padding(18.dp)
             )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
             Text(
                 text = "Cawabonga",
-                modifier = Modifier.padding(start = 18.dp)
-                    .offset(0.dp, (-12).dp),
                 textAlign = TextAlign.Center,
                 fontFamily = quicksand,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 28.sp,
+                fontWeight = FontWeight.Bold,
+//                color = DeepBlue,
+                fontSize = 32.sp,
             )
+
+            Spacer(modifier = Modifier.height(4.dp))
+
             Row(
-                modifier = Modifier.fillMaxWidth()
-                    .padding(horizontal = 18.dp)
-                    .offset(0.dp, (-12).dp),
+                modifier = Modifier
+                    .fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
-            ){
+            ) {
                 Text(
                     text = "Uluwatu, Bali",
-                    textAlign = TextAlign.Center,
                     fontFamily = quicksand,
-                    fontWeight = FontWeight.Medium,
+                    fontStyle = FontStyle.Italic,
                     fontSize = 16.sp,
+//                color = DeepBlue,
+
                 )
                 Row {
                     DifficultyFilledImage()
@@ -180,12 +197,12 @@ fun DifficultyFilledImage() {
     )
 }
 
-@Composable
-fun ShowCards(cards: List<Cards>) {
-
-    Column(modifier = Modifier.verticalScroll()) {
-        cards.forEach { card ->
-            CardRow(card)
-        }
-    }
-}
+//@Composable
+//fun ShowCards(cards: List<Cards>) {
+//
+//    Column(modifier = Modifier.verticalScroll()) {
+//        cards.forEach { card ->
+//            CardRow(card)
+//        }
+//    }
+//}
