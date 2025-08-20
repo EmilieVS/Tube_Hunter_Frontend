@@ -16,23 +16,30 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.tube_hunter.frontend.ui.theme.BackButton
+import com.tube_hunter.frontend.ui.theme.DeepBlue
+import com.tube_hunter.frontend.ui.theme.DrySand
+import com.tube_hunter.frontend.ui.theme.LagoonBlue
 import com.tube_hunter.frontend.ui.theme.WhiteFoam
 import com.tube_hunter.frontend.ui.theme.chewy
 import com.tube_hunter.frontend.ui.theme.quicksand
@@ -64,37 +71,65 @@ class SpotDetailsActivity : ComponentActivity() {
                     .align(Alignment.Center)
                     .fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Top
+                verticalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(
-                    text = "TUBE HUNTER",
-                    textAlign = TextAlign.Center,
-                    fontSize = 48.sp,
-                    fontFamily = chewy,
-                    color = WhiteFoam,
-                    modifier = Modifier.padding(top = 48.dp)
-                )
+                BrandTitle()
 
-                SpotCard(
+                SpotCard()
 
-                )
-
-                BackButton {
-                    val intent = Intent(this@SpotDetailsActivity, SpotsListActivity::class.java)
-                    startActivity(intent)
+                Button(
+                    onClick = {
+                        val intent = Intent(this@SpotDetailsActivity, SpotsListActivity::class.java)
+                        startActivity(intent)
+                    },
+                    colors = ButtonDefaults.buttonColors(DrySand, DeepBlue),
+                    modifier = Modifier.padding(bottom = 48.dp)
+                ) {
+                    Text(
+                        text = "Back",
+                        fontFamily = quicksand,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold
+                    )
                 }
             }
         }
     }
 }
-@Preview
+@Composable
+fun BrandTitle() {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier.padding(top = 48.dp)
+    ) {
+        Text(
+            text = "TUBE HUNTER",
+            fontSize = 56.sp,
+            fontFamily = chewy,
+            color = DeepBlue,
+            style = androidx.compose.ui.text.TextStyle(
+                shadow = Shadow(
+                    color = DeepBlue,
+                    offset = Offset(0f, 0f),
+                    blurRadius = 16f
+                )
+            )
+        )
+        Text(
+            text = "TUBE HUNTER",
+            fontSize = 56.sp,
+            fontFamily = chewy,
+            color = WhiteFoam
+        )
+    }
+}
+
 @Composable
 fun SpotCard() {
     Card(
         modifier = Modifier
-            .padding(32.dp)
+            .padding(horizontal = 40.dp)
             .fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
             containerColor = WhiteFoam
         ),
@@ -111,69 +146,135 @@ fun SpotCard() {
                 contentDescription = "Spot photo",
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(16.dp))
+                    .clip(RoundedCornerShape(8.dp))
                     .height(180.dp),
                 contentScale = ContentScale.Crop
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Cawabunga",
+                text = "Cowabunga",
                 fontSize = 32.sp,
                 fontFamily = quicksand,
                 fontWeight = FontWeight.Bold,
-                color = Color.Black //mettre bleu marine
+                color = DeepBlue
             )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = "Biscarrosse, France",
-                fontSize = 14.sp,
-                fontFamily = quicksand,
-                color = Color.Black // bleu marine leger
-            )
-
-            Spacer(modifier = Modifier.height(32.dp))
-
-            Row (
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ){
-                Text(text = "DIFFICULTY", fontSize = 14.sp, color = Color.Black, fontWeight = FontWeight.Bold, fontFamily = quicksand)
-                Text(text = "1/5", fontSize = 14.sp, color = Color.Black, fontFamily = quicksand) // mettre icones
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Row (
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ){
-                Text(text = "SURF BREAK", fontSize = 14.sp, color = Color.Black, fontWeight = FontWeight.Bold, fontFamily = quicksand)
-                Text(text = "Reef Break", fontSize = 14.sp, color = Color.Black, fontFamily = quicksand)
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(text = "SEASON", fontSize = 14.sp, color = Color.Black, fontWeight = FontWeight.Bold, fontFamily = quicksand)
 
             Spacer(modifier = Modifier.height(4.dp))
 
-            Row (
+            Text(
+                text = "Biscarrosse, France",
+                fontSize = 16.sp,
+                fontStyle = FontStyle.Italic,
+                fontFamily = quicksand,
+                color = DeepBlue // bleu marine leger
+            )
+
+            Spacer(modifier = Modifier.height(48.dp))
+
+            Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
-            ){
-                Text(text = "03 Jul", fontSize = 14.sp, color = Color.Black, fontFamily = quicksand)
-                Image(
-                    painter = painterResource(id = R.drawable.arrow_right_bold),
-                    contentDescription = "Right Arrow",
-                    modifier = Modifier
-                        .height(16.dp),
+            ) {
+                Text(
+                    text = "DIFFICULTY",
+                    fontSize = 16.sp,
+                    color = DeepBlue,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = quicksand
                 )
-                Text(text = "10 Oct", fontSize = 14.sp, color = Color.Black, fontFamily = quicksand)
+                Text(
+                    text = "1/5",
+                    fontSize = 16.sp,
+                    color = DeepBlue,
+                    fontFamily = quicksand
+                ) // mettre icones
             }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "SURF BREAK",
+                    fontSize = 16.sp,
+                    color = DeepBlue,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = quicksand
+                )
+                Text(
+                    text = "Reef Break",
+                    fontSize = 16.sp,
+                    color = DeepBlue,
+                    fontFamily = quicksand
+                )
+            }
+
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.Top,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "SEASON",
+                    fontSize = 16.sp,
+                    color = DeepBlue,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = quicksand
+                )
+
+                Row(
+                    modifier = Modifier.width(170.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Surface(
+                        shape = RoundedCornerShape(12.dp),
+                        color = LagoonBlue
+                    ) {
+                        Text(
+                            modifier = Modifier
+                                .padding(12.dp),
+                            text = "03 Jul",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = WhiteFoam,
+                            fontFamily = quicksand
+                        )
+                    }
+                    Image(
+                        painter = painterResource(id = R.drawable.arrow_right_bold),
+                        contentDescription = "Right Arrow",
+                        modifier = Modifier
+                            .height(16.dp),
+                    )
+                    Surface(
+                        shape = RoundedCornerShape(12.dp),
+                        color = LagoonBlue
+                    ) {
+
+                        Text(
+                            modifier = Modifier
+                                .padding(12.dp),
+                            text = "10 Oct",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = WhiteFoam,
+                            fontFamily = quicksand
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+
         }
     }
 }

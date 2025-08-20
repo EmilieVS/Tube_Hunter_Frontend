@@ -12,6 +12,8 @@ val Pink40 = Color(0xFF7D5260)
 
 val WhiteFoam = Color(0xFFF3F3EA)
 
-val LagoonBlue = Color(0xFF3BA9A4)
+val LagoonBlue = Color(0xFF1596A6)
+
+val DeepBlue = Color(0xFF07373D)
 
 val DrySand = Color(0xFFE5D3B3)
