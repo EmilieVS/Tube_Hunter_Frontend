@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -97,11 +96,25 @@ fun SpotCard() {
             Text(
                 text = "Cawabonga",
                 modifier = Modifier.padding(start = 18.dp)
-                    .offset(0.dp, -12.dp),
+                    .offset(0.dp, (-12).dp),
                 textAlign = TextAlign.Center,
                 fontFamily = quicksand,
                 fontWeight = FontWeight.SemiBold,
-                fontSize = 28.sp
+                fontSize = 28.sp,
+            )
+            Text(
+                text = "Uluwatu, Bali",
+                modifier = Modifier.padding(start = 18.dp)
+                    .offset(0.dp, (-12).dp),
+                textAlign = TextAlign.Center,
+                fontFamily = quicksand,
+                fontWeight = FontWeight.Medium,
+                fontSize = 16.sp,
+            )
+            Image(
+                painter = painterResource(id = R.drawable.person_simple_snowboard_bold),
+                contentDescription = null,
+                modifier = Modifier.size(width = 30.dp, height = 18.dp)
             )
         }
     }
