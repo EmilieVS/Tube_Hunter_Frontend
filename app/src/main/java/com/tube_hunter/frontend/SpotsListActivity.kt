@@ -1,5 +1,6 @@
 package com.tube_hunter.frontend
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -11,11 +12,15 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
@@ -23,7 +28,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -70,13 +77,26 @@ fun BackgroundLoading() {
             color = WhiteFoam,
             modifier = Modifier.padding(top = 48.dp, bottom = 8.dp)
         )
-            SpotCard()
-            SpotCard()
+            Column {
+                SpotCard()
+                Spacer(modifier = Modifier.height(24.dp))
+                SpotCard()
+                Spacer(modifier = Modifier.height(24.dp))
+            }
+            val context = LocalContext.current
+            Button(
+                onClick = {
+                    val intent = Intent(context, MainActivity::class.java)
+                    context.startActivity(intent)
+                },
+                colors = ButtonDefaults.buttonColors(WhiteFoam, Color.Black),
+            ) {
+                Text("Add spot", fontFamily = quicksand, fontWeight = FontWeight.Bold)
+            }
         }
     }
 }
 
-@Preview
 @Composable
 fun SpotCard() {
     Card(
@@ -84,17 +104,19 @@ fun SpotCard() {
             containerColor = WhiteFoam,
         ),
         modifier = Modifier
-            .size(width = 300.dp, height = 280.dp)
-            .padding(vertical = 8.dp),
+            .fillMaxWidth()
+            .padding(horizontal = 40.dp),
     ) {
         Column {
             Image(
                 painter = painterResource(id = R.drawable.sunset_wave),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
-                modifier = Modifier.size(width = 300.dp, height = 180.dp)
-                    .padding(18.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
                     .clip(RoundedCornerShape(8.dp))
+                    .height(180.dp)
+                    .padding(18.dp)
             )
             Text(
                 text = "Cawabonga",
@@ -105,45 +127,45 @@ fun SpotCard() {
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 28.sp,
             )
-            Row{
+            Row(
+                modifier = Modifier.fillMaxWidth()
+                    .padding(horizontal = 18.dp)
+                    .offset(0.dp, (-12).dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ){
                 Text(
                     text = "Uluwatu, Bali",
-                    modifier = Modifier.padding(start = 18.dp)
-                        .offset(0.dp, (-12).dp),
                     textAlign = TextAlign.Center,
                     fontFamily = quicksand,
                     fontWeight = FontWeight.Medium,
                     fontSize = 16.sp,
                 )
-                Spacer(modifier = Modifier.width(80.dp))
-                DifficultyFilledImage()
-                DifficultyFilledImage()
-                DifficultyFilledImage()
-                DifficultyFilledImage()
-                DifficultyImage()
+                Row {
+                    DifficultyFilledImage()
+                    DifficultyFilledImage()
+                    DifficultyFilledImage()
+                    DifficultyFilledImage()
+                    DifficultyImage()
+                }
             }
         }
     }
 }
 
-@Preview
 @Composable
 fun DifficultyImage() {
     Image(
         painter = painterResource(id = R.drawable.person_simple_snowboard_bold),
         contentDescription = null,
         modifier = Modifier.size(width = 18.dp, height = 18.dp)
-            .offset(0.dp, (-12).dp)
     )
 }
 
-@Preview
 @Composable
 fun DifficultyFilledImage() {
     Image(
         painter = painterResource(id = R.drawable.person_simple_snowboard_fill),
         contentDescription = null,
         modifier = Modifier.size(width = 18.dp, height = 18.dp)
-            .offset(0.dp, (-12).dp)
     )
 }
