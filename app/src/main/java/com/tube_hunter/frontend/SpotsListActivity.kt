@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -18,7 +19,9 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -77,14 +80,21 @@ fun BackgroundLoading() {
             color = WhiteFoam,
             modifier = Modifier.padding(top = 48.dp, bottom = 8.dp)
         )
-            Column {
+            Column (
+                modifier = Modifier
+                    .fillMaxHeight(0.85f)
+                    .wrapContentHeight()
+            ){
                 SpotCard()
                 Spacer(modifier = Modifier.height(24.dp))
                 SpotCard()
                 Spacer(modifier = Modifier.height(24.dp))
+                SpotCard()
+
             }
             val context = LocalContext.current
             Button(
+                modifier = Modifier.padding(24.dp),
                 onClick = {
                     val intent = Intent(context, MainActivity::class.java)
                     context.startActivity(intent)
@@ -168,4 +178,14 @@ fun DifficultyFilledImage() {
         contentDescription = null,
         modifier = Modifier.size(width = 18.dp, height = 18.dp)
     )
+}
+
+@Composable
+fun ShowCards(cards: List<Cards>) {
+
+    Column(modifier = Modifier.verticalScroll()) {
+        cards.forEach { card ->
+            CardRow(card)
+        }
+    }
 }
