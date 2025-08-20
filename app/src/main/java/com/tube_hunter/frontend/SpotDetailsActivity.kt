@@ -75,7 +75,7 @@ class SpotDetailsActivity : ComponentActivity() {
             ) {
                 BrandTitle()
 
-                SpotCard()
+                SpotDetailsCard()
 
                 Button(
                     onClick = {
@@ -125,7 +125,7 @@ fun BrandTitle() {
 }
 
 @Composable
-fun SpotCard() {
+fun SpotDetailsCard() {
     Card(
         modifier = Modifier
             .padding(horizontal = 40.dp)

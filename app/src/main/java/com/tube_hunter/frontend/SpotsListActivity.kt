@@ -1,6 +1,5 @@
 package com.tube_hunter.frontend
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -11,14 +10,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -31,7 +27,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -39,9 +34,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat.startActivity
+import com.tube_hunter.frontend.ui.theme.DeepBlue
 import com.tube_hunter.frontend.ui.theme.WhiteFoam
-import com.tube_hunter.frontend.ui.theme.chewy
 import com.tube_hunter.frontend.ui.theme.quicksand
 
 class SpotsListActivity : ComponentActivity() {
@@ -73,7 +67,7 @@ fun SpotsList() {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-//            BrandTitle()
+            BrandTitle()
 
 //            Appeler SpotList pour afficher les cartes de Spot, Column doit être fait dans le composant Spotlist
 //            SpotList()
@@ -115,7 +109,6 @@ fun SpotsList() {
 
 @Composable
 fun SpotCard() {
-//    penser à modifier dans SpotDetailsActivity le nom de SpotCard en SpotDetailsCard
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -148,7 +141,7 @@ fun SpotCard() {
                 textAlign = TextAlign.Center,
                 fontFamily = quicksand,
                 fontWeight = FontWeight.Bold,
-//                color = DeepBlue,
+                color = DeepBlue,
                 fontSize = 32.sp,
             )
 
@@ -164,7 +157,7 @@ fun SpotCard() {
                     fontFamily = quicksand,
                     fontStyle = FontStyle.Italic,
                     fontSize = 16.sp,
-//                color = DeepBlue,
+                    color = DeepBlue,
 
                 )
                 Row {
