@@ -10,5 +10,5 @@ val chewy = FontFamily(
 )
 
 val quicksand = FontFamily(
-    Font(R.font.quicksand_variable_font_wght, FontWeight.Bold),
+    Font(R.font.quicksand_variable)
 )

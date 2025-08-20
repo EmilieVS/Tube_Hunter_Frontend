@@ -9,8 +9,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -18,6 +20,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -60,11 +63,12 @@ fun BackgroundLoading() {
         Text(
             text = "TUBE HUNTER",
             textAlign = TextAlign.Center,
-            fontSize = 48.sp,
+            fontSize = 56.sp,
             fontFamily = chewy,
             color = WhiteFoam,
             modifier = Modifier.padding(top = 48.dp, bottom = 8.dp)
         )
+            SpotCard()
             SpotCard()
         }
     }
@@ -75,26 +79,30 @@ fun BackgroundLoading() {
 fun SpotCard() {
     Card(
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            containerColor = WhiteFoam,
         ),
         modifier = Modifier
-            .size(width = 240.dp, height = 300.dp)
-            .padding(vertical = 0.dp),
+            .size(width = 300.dp, height = 280.dp)
+            .padding(vertical = 8.dp),
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.sunset_wave),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.size(width = 240.dp, height = 140.dp)
-                .padding(24.dp),
-        )
-        Text(
-            text = "Name of the spot",
-            modifier = Modifier
-                .padding(start = 24.dp),
-            textAlign = TextAlign.Center,
-            fontFamily = quicksand,
-            fontWeight = FontWeight.Bold,
-        )
+        Column {
+            Image(
+                painter = painterResource(id = R.drawable.sunset_wave),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.size(width = 300.dp, height = 180.dp)
+                    .padding(18.dp)
+                    .clip(RoundedCornerShape(8.dp))
+            )
+            Text(
+                text = "Cawabonga",
+                modifier = Modifier.padding(start = 18.dp)
+                    .offset(0.dp, -12.dp),
+                textAlign = TextAlign.Center,
+                fontFamily = quicksand,
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 28.sp
+            )
+        }
     }
 }
