@@ -27,6 +27,11 @@
             android:label="Spots List Page"
             android:exported="false">
         </activity>
+        <activity
+            android:name=".SpotDetailsActivity"
+            android:label="Spot Details Page"
+            android:exported="false">
+        </activity>
     </application>
 
 </manifest>
