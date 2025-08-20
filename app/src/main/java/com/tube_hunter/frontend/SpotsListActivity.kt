@@ -8,10 +8,13 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -102,20 +105,45 @@ fun SpotCard() {
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 28.sp,
             )
-            Text(
-                text = "Uluwatu, Bali",
-                modifier = Modifier.padding(start = 18.dp)
-                    .offset(0.dp, (-12).dp),
-                textAlign = TextAlign.Center,
-                fontFamily = quicksand,
-                fontWeight = FontWeight.Medium,
-                fontSize = 16.sp,
-            )
-            Image(
-                painter = painterResource(id = R.drawable.person_simple_snowboard_bold),
-                contentDescription = null,
-                modifier = Modifier.size(width = 30.dp, height = 18.dp)
-            )
+            Row{
+                Text(
+                    text = "Uluwatu, Bali",
+                    modifier = Modifier.padding(start = 18.dp)
+                        .offset(0.dp, (-12).dp),
+                    textAlign = TextAlign.Center,
+                    fontFamily = quicksand,
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 16.sp,
+                )
+                Spacer(modifier = Modifier.width(80.dp))
+                DifficultyFilledImage()
+                DifficultyFilledImage()
+                DifficultyFilledImage()
+                DifficultyFilledImage()
+                DifficultyImage()
+            }
         }
     }
+}
+
+@Preview
+@Composable
+fun DifficultyImage() {
+    Image(
+        painter = painterResource(id = R.drawable.person_simple_snowboard_bold),
+        contentDescription = null,
+        modifier = Modifier.size(width = 18.dp, height = 18.dp)
+            .offset(0.dp, (-12).dp)
+    )
+}
+
+@Preview
+@Composable
+fun DifficultyFilledImage() {
+    Image(
+        painter = painterResource(id = R.drawable.person_simple_snowboard_fill),
+        contentDescription = null,
+        modifier = Modifier.size(width = 18.dp, height = 18.dp)
+            .offset(0.dp, (-12).dp)
+    )
 }
