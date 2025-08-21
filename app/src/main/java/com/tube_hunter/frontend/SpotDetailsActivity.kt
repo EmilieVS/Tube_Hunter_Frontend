@@ -81,7 +81,7 @@ fun SpotDetails() {
                 photoUrl = "https://res.cloudinary.com/manawa/image/private/f_auto,c_limit,w_3840,q_auto/aykvlohikeutpdcp720o",
                 name = "Cowabunga",
                 location = "Biscarosse, France",
-                difficulty = "3/5",
+                difficulty = 3,
                 surfBreak = "Reef Break",
                 seasonBegins = "03 Jul",
                 seasonEnds = "30 Oct"
@@ -113,7 +113,7 @@ data class Spot(
     val photoUrl: String,
     val name: String,
     val location: String,
-    val difficulty: String,
+    val difficulty: Int,
     val surfBreak: String,
     val seasonBegins: String,
     val seasonEnds: String,
@@ -208,7 +208,7 @@ fun SpotDetailsCard(spot: Spot) {
                     fontFamily = quicksand
                 )
                 Text(
-                    text = spot.difficulty,
+                    text = "${spot.difficulty}",
                     fontSize = 16.sp,
                     color = DeepBlue,
                     fontFamily = quicksand

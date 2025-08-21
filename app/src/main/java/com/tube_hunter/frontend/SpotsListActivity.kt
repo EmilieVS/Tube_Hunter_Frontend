@@ -54,7 +54,6 @@ class SpotsListActivity : ComponentActivity() {
 
 
 
-data class Spot(val name: String, val location: String, val difficulty: Int)
 @Preview
 @Composable
 fun SpotsList() {
@@ -78,9 +77,33 @@ fun SpotsList() {
             BrandTitle()
 
             val spots = listOf(
-                Spot("Pipeline", "Hawaii", 4),
-                Spot("Teahupo'o", "Tahiti", 5),
-                Spot("Mundaka", "Espagne", 3)
+                Spot(
+                    photoUrl = "https://res.cloudinary.com/manawa/image/private/f_auto,c_limit,w_3840,q_auto/aykvlohikeutpdcp720o",
+                    name = "Cowabunga",
+                    location = "Biscarosse, France",
+                    difficulty = 3,
+                    surfBreak = "Reef Break",
+                    seasonBegins = "03 Jul",
+                    seasonEnds = "30 Oct"
+                ),
+                Spot(
+                    photoUrl = "https://res.cloudinary.com/manawa/image/private/f_auto,c_limit,w_3840,q_auto/aykvlohikeutpdcp720o",
+                    name = "Nice",
+                    location = "Nice, France",
+                    difficulty = 1,
+                    surfBreak = "Beach Break",
+                    seasonBegins = "01 Aug",
+                    seasonEnds = "20 Nov"
+                ),
+                Spot(
+                    photoUrl = "https://res.cloudinary.com/manawa/image/private/f_auto,c_limit,w_3840,q_auto/aykvlohikeutpdcp720o",
+                    name = "Waikikki",
+                    location = "tehaupopo, France",
+                    difficulty = 5,
+                    surfBreak = "Point Break",
+                    seasonBegins = "02 Jul",
+                    seasonEnds = "20 Oct"
+                )
             )
 
             ShowCards(spots)
@@ -88,7 +111,7 @@ fun SpotsList() {
             val context = LocalContext.current
             Button(
                 onClick = {
-                    val intent = Intent(context, MainActivity::class.java)
+                    val intent = Intent(context, SpotDetailsActivity::class.java)
                     context.startActivity(intent)
                 },
                 colors = ButtonDefaults.buttonColors(WhiteFoam, Color.Black),
