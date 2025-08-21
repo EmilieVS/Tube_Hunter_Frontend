@@ -9,8 +9,10 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -215,16 +217,17 @@ fun DifficultyFilledImage() {
 
 @Composable
 fun ShowCards(spots: List<Spot>) {
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(600.dp) ,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(0.80f),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
 
-    ) {
-        items(spots) { spot ->
-            SpotCard(spot)
+        ) {
+            items(spots) { spot ->
+                SpotCard(spot)
+            }
         }
-    }
+
 }
 
