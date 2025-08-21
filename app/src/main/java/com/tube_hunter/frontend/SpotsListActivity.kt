@@ -1,5 +1,6 @@
 package com.tube_hunter.frontend
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -15,6 +16,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -27,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -43,14 +47,18 @@ class SpotsListActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            SpotsList()
+                SpotsList()
+            }
         }
     }
-}
 
+
+
+data class Spot(val name: String, val location: String, val difficulty: Int)
 @Preview
 @Composable
 fun SpotsList() {
+
     Box(
         modifier = Modifier.fillMaxSize(),
     ) {
@@ -69,33 +77,24 @@ fun SpotsList() {
         ) {
             BrandTitle()
 
-//            Appeler SpotList pour afficher les cartes de Spot, Column doit être fait dans le composant Spotlist
-//            SpotList()
-            SpotCard()
+            val spots = listOf(
+                Spot("Pipeline", "Hawaii", 4),
+                Spot("Teahupo'o", "Tahiti", 5),
+                Spot("Mundaka", "Espagne", 3)
+            )
 
-//            !!!!! A SUPPRIMER n'est plus utile avec SpotList !!!!!
-//            Column(
-//                modifier = Modifier
-//                    .fillMaxHeight(0.85f)
-//                    .wrapContentHeight()
-//            ) {
-//                SpotCard()
-//                Spacer(modifier = Modifier.height(24.dp))
-//                SpotCard()
-//                Spacer(modifier = Modifier.height(24.dp))
-//                SpotCard()
-//
-//            }
+            ShowCards(spots)
 
+            val context = LocalContext.current
             Button(
                 onClick = {
-//                     REPRENDRE PROBLEME BOUTON LIEN this@
-//                    val intent = Intent(this@SpotsListActivity, MainActivity::class.java)
-//                    startActivity(intent)
+                    val intent = Intent(context, MainActivity::class.java)
+                    context.startActivity(intent)
                 },
                 colors = ButtonDefaults.buttonColors(WhiteFoam, Color.Black),
                 modifier = Modifier.padding(bottom = 48.dp),
             ) {
+
                 Text(
                     "Add spot",
                     fontFamily = quicksand,
@@ -107,8 +106,9 @@ fun SpotsList() {
     }
 }
 
+
 @Composable
-fun SpotCard() {
+fun SpotCard(spot: Spot) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -137,7 +137,7 @@ fun SpotCard() {
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Cawabonga",
+                text = spot.name,
                 textAlign = TextAlign.Center,
                 fontFamily = quicksand,
                 fontWeight = FontWeight.Bold,
@@ -153,7 +153,7 @@ fun SpotCard() {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = "Uluwatu, Bali",
+                    text = spot.location,
                     fontFamily = quicksand,
                     fontStyle = FontStyle.Italic,
                     fontSize = 16.sp,
@@ -190,12 +190,18 @@ fun DifficultyFilledImage() {
     )
 }
 
-//@Composable
-//fun ShowCards(cards: List<Cards>) {
-//
-//    Column(modifier = Modifier.verticalScroll()) {
-//        cards.forEach { card ->
-//            CardRow(card)
-//        }
-//    }
-//}
+@Composable
+fun ShowCards(spots: List<Spot>) {
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(600.dp) ,
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+
+    ) {
+        items(spots) { spot ->
+            SpotCard(spot)
+        }
+    }
+}
+
