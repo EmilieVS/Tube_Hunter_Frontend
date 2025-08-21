@@ -6,6 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -40,6 +41,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.tube_hunter.frontend.ui.theme.DeepBlue
 import com.tube_hunter.frontend.ui.theme.WhiteFoam
 import com.tube_hunter.frontend.ui.theme.quicksand
@@ -53,8 +55,6 @@ class SpotsListActivity : ComponentActivity() {
             }
         }
     }
-
-
 
 @Preview
 @Composable
@@ -89,7 +89,7 @@ fun SpotsList() {
                     seasonEnds = "30 Oct"
                 ),
                 Spot(
-                    photoUrl = "https://res.cloudinary.com/manawa/image/private/f_auto,c_limit,w_3840,q_auto/aykvlohikeutpdcp720o",
+                    photoUrl = "https://imgs.search.brave.com/ZPxq62S1prqY9V36vuTfxsmDOOVcedPUuvtEeD0IwgA/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9wcmV2/aWV3LnJlZGQuaXQv/d2hhdHMtdGhlLWJl/c3Qtc3VyZi1waG90/by1vZi1hbGwtdGlt/ZS12MC11eDJldWd1/YTg0ZmIxLmpwZWc_/d2lkdGg9MTI4MCZh/dXRvPXdlYnAmcz1i/YjdjNGJkNWYyOGQw/ZDc3ZDRjMTA5MDUw/MjQ4MGU4YzhlNTgy/M2Fm",
                     name = "Nice",
                     location = "Nice, France",
                     difficulty = 1,
@@ -98,7 +98,7 @@ fun SpotsList() {
                     seasonEnds = "20 Nov"
                 ),
                 Spot(
-                    photoUrl = "https://res.cloudinary.com/manawa/image/private/f_auto,c_limit,w_3840,q_auto/aykvlohikeutpdcp720o",
+                    photoUrl = "https://imgs.search.brave.com/Yf47g4zEFSgYHUTiv-iIc7VZZn795NSaB_BX0PfS7Ek/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9jZG4u/cGl4YWJheS5jb20v/cGhvdG8vMjAyMi8w/OS8xNS8wOS8wNS9t/YW4tNzQ1NjA0NF8x/MjgwLmpwZw",
                     name = "Waikikki",
                     location = "tehaupopo, France",
                     difficulty = 5,
@@ -131,13 +131,18 @@ fun SpotsList() {
     }
 }
 
-
 @Composable
 fun SpotCard(spot: Spot) {
+    val context = LocalContext.current
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 40.dp),
+            .padding(horizontal = 40.dp)
+            .clickable {
+                val intent = Intent(context, SpotDetailsActivity::class.java)
+                intent.putExtra("spot", spot)
+                context.startActivity(intent)
+    },
         colors = CardDefaults.cardColors(
             containerColor = WhiteFoam,
         ),
@@ -149,9 +154,9 @@ fun SpotCard(spot: Spot) {
             modifier = Modifier.padding(16.dp),
             horizontalAlignment = Alignment.Start
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.sunset_wave),
-                contentDescription = "Spot Photo",
+            AsyncImage(
+                model = spot.photoUrl,
+                contentDescription = spot.name,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -222,12 +227,10 @@ fun ShowCards(spots: List<Spot>) {
                 .fillMaxWidth()
                 .fillMaxHeight(0.80f),
             verticalArrangement = Arrangement.spacedBy(16.dp)
-
         ) {
             items(spots) { spot ->
                 SpotCard(spot)
             }
         }
-
 }
 
