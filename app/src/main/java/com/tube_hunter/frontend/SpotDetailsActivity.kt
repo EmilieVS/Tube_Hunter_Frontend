@@ -40,12 +40,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.tube_hunter.frontend.ui.theme.DeepBlue
-import com.tube_hunter.frontend.ui.theme.DrySand
 import com.tube_hunter.frontend.ui.theme.LagoonBlue
 import com.tube_hunter.frontend.ui.theme.WhiteFoam
 import com.tube_hunter.frontend.ui.theme.chewy
 import com.tube_hunter.frontend.ui.theme.quicksand
-import org.jetbrains.annotations.Async
 
 class SpotDetailsActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -159,7 +157,7 @@ fun SpotDetailsCard(spot: Spot) {
             containerColor = WhiteFoam
         ),
         elevation = CardDefaults.cardElevation(
-            defaultElevation = 6.dp // petite ombre
+            defaultElevation = 6.dp
         )
     ) {
         Column(
@@ -214,7 +212,7 @@ fun SpotDetailsCard(spot: Spot) {
                     fontSize = 16.sp,
                     color = DeepBlue,
                     fontFamily = quicksand
-                ) // mettre icones
+                )
             }
 
             Spacer(modifier = Modifier.height(24.dp))
