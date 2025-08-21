@@ -44,20 +44,24 @@ import com.tube_hunter.frontend.ui.theme.LagoonBlue
 import com.tube_hunter.frontend.ui.theme.WhiteFoam
 import com.tube_hunter.frontend.ui.theme.chewy
 import com.tube_hunter.frontend.ui.theme.quicksand
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
 class SpotDetailsActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        val spot = intent.getParcelableExtra<Spot>("spot")
         setContent {
-            SpotDetails()
+            spot?.let {
+                SpotDetails(it)
+            }
         }
     }
 }
 
-@Preview
 @Composable
-fun SpotDetails() {
+fun SpotDetails(spot: Spot) {
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -77,15 +81,6 @@ fun SpotDetails() {
         ) {
             BrandTitle()
 
-            val spot = Spot(
-                photoUrl = "https://res.cloudinary.com/manawa/image/private/f_auto,c_limit,w_3840,q_auto/aykvlohikeutpdcp720o",
-                name = "Cowabunga",
-                location = "Biscarosse, France",
-                difficulty = 3,
-                surfBreak = "Reef Break",
-                seasonBegins = "03 Jul",
-                seasonEnds = "30 Oct"
-            )
             SpotDetailsCard(spot)
 
             val context = LocalContext.current
@@ -108,7 +103,7 @@ fun SpotDetails() {
     }
 }
 
-
+@Parcelize
 data class Spot(
     val photoUrl: String,
     val name: String,
@@ -117,7 +112,7 @@ data class Spot(
     val surfBreak: String,
     val seasonBegins: String,
     val seasonEnds: String,
-)
+) : Parcelable
 
 @Composable
 fun BrandTitle() {
@@ -208,7 +203,7 @@ fun SpotDetailsCard(spot: Spot) {
                     fontFamily = quicksand
                 )
                 Text(
-                    text = "${spot.difficulty}",
+                    text = "${spot.difficulty}/5",
                     fontSize = 16.sp,
                     color = DeepBlue,
                     fontFamily = quicksand
