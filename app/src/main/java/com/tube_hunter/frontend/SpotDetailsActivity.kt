@@ -31,14 +31,15 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.tube_hunter.frontend.ui.theme.DeepBlue
-import com.tube_hunter.frontend.ui.theme.DrySand
 import com.tube_hunter.frontend.ui.theme.LagoonBlue
 import com.tube_hunter.frontend.ui.theme.WhiteFoam
 import com.tube_hunter.frontend.ui.theme.chewy
@@ -52,50 +53,72 @@ class SpotDetailsActivity : ComponentActivity() {
             SpotDetails()
         }
     }
+}
 
-    @Preview
-    @Composable
-    fun SpotDetails() {
-        Box(
-            modifier = Modifier.fillMaxSize()
+@Preview
+@Composable
+fun SpotDetails() {
+    Box(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.background_tube_hunter),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.matchParentSize()
+        )
+
+        Column(
+            modifier = Modifier
+                .align(Alignment.Center)
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceBetween
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.background_tube_hunter),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.matchParentSize()
+            BrandTitle()
+
+            val spot = Spot(
+                photoUrl = "https://res.cloudinary.com/manawa/image/private/f_auto,c_limit,w_3840,q_auto/aykvlohikeutpdcp720o",
+                name = "Cowabunga",
+                location = "Biscarosse, France",
+                difficulty = "3/5",
+                surfBreak = "Reef Break",
+                seasonBegins = "03 Jul",
+                seasonEnds = "30 Oct"
             )
+            SpotDetailsCard(spot)
 
-            Column(
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.SpaceBetween
+            val context = LocalContext.current
+            Button(
+                onClick = {
+                    val intent = Intent(context, SpotsListActivity::class.java)
+                    context.startActivity(intent)
+                },
+                colors = ButtonDefaults.buttonColors(WhiteFoam, DeepBlue),
+                modifier = Modifier.padding(bottom = 48.dp)
             ) {
-                BrandTitle()
-
-                SpotDetailsCard()
-
-                Button(
-                    onClick = {
-                        val intent = Intent(this@SpotDetailsActivity, SpotsListActivity::class.java)
-                        startActivity(intent)
-                    },
-                    colors = ButtonDefaults.buttonColors(DrySand, DeepBlue),
-                    modifier = Modifier.padding(bottom = 48.dp)
-                ) {
-                    Text(
-                        text = "Back",
-                        fontFamily = quicksand,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
+                Text(
+                    text = "Back",
+                    fontFamily = quicksand,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold
+                )
             }
         }
     }
 }
+
+
+data class Spot(
+    val photoUrl: String,
+    val name: String,
+    val location: String,
+    val difficulty: String,
+    val surfBreak: String,
+    val seasonBegins: String,
+    val seasonEnds: String,
+)
+
 @Composable
 fun BrandTitle() {
     Box(
@@ -125,7 +148,7 @@ fun BrandTitle() {
 }
 
 @Composable
-fun SpotDetailsCard() {
+fun SpotDetailsCard(spot: Spot) {
     Card(
         modifier = Modifier
             .padding(horizontal = 40.dp)
@@ -134,16 +157,16 @@ fun SpotDetailsCard() {
             containerColor = WhiteFoam
         ),
         elevation = CardDefaults.cardElevation(
-            defaultElevation = 6.dp // petite ombre
+            defaultElevation = 6.dp
         )
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
             horizontalAlignment = Alignment.Start
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.background_tube_hunter),
-                contentDescription = "Spot photo",
+            AsyncImage(
+                model = spot.photoUrl,
+                contentDescription = spot.name,
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(8.dp))
@@ -154,7 +177,7 @@ fun SpotDetailsCard() {
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Cowabunga",
+                text = spot.name,
                 fontSize = 32.sp,
                 fontFamily = quicksand,
                 fontWeight = FontWeight.Bold,
@@ -164,7 +187,7 @@ fun SpotDetailsCard() {
             Spacer(modifier = Modifier.height(4.dp))
 
             Text(
-                text = "Biscarrosse, France",
+                text = spot.location,
                 fontSize = 16.sp,
                 fontStyle = FontStyle.Italic,
                 fontFamily = quicksand,
@@ -185,11 +208,11 @@ fun SpotDetailsCard() {
                     fontFamily = quicksand
                 )
                 Text(
-                    text = "1/5",
+                    text = spot.difficulty,
                     fontSize = 16.sp,
                     color = DeepBlue,
                     fontFamily = quicksand
-                ) // mettre icones
+                )
             }
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -206,7 +229,7 @@ fun SpotDetailsCard() {
                     fontFamily = quicksand
                 )
                 Text(
-                    text = "Reef Break",
+                    text = spot.surfBreak,
                     fontSize = 16.sp,
                     color = DeepBlue,
                     fontFamily = quicksand
@@ -241,7 +264,7 @@ fun SpotDetailsCard() {
                         Text(
                             modifier = Modifier
                                 .padding(12.dp),
-                            text = "03 Jul",
+                            text = spot.seasonBegins,
                             fontSize = 16.sp,
                             fontWeight = FontWeight.SemiBold,
                             color = WhiteFoam,
@@ -262,7 +285,7 @@ fun SpotDetailsCard() {
                         Text(
                             modifier = Modifier
                                 .padding(12.dp),
-                            text = "10 Oct",
+                            text = spot.seasonEnds,
                             fontSize = 16.sp,
                             fontWeight = FontWeight.SemiBold,
                             color = WhiteFoam,
