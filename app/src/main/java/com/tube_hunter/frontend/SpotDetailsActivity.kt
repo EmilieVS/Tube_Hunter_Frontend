@@ -2,6 +2,7 @@ package com.tube_hunter.frontend
 
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -44,6 +45,8 @@ import com.tube_hunter.frontend.ui.theme.WhiteFoam
 import com.tube_hunter.frontend.ui.theme.chewy
 import com.tube_hunter.frontend.ui.theme.quicksand
 import android.os.Parcelable
+import androidx.annotation.RequiresApi
+import androidx.compose.ui.tooling.preview.Preview
 import kotlinx.parcelize.Parcelize
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -144,11 +147,12 @@ fun BrandTitle() {
     }
 }
 
+
 @Composable
 fun SpotDetailsCard(spot: Spot) {
     Card(
         modifier = Modifier
-            .padding(horizontal = 40.dp)
+            .padding(horizontal = 24.dp)
             .fillMaxWidth(),
         colors = CardDefaults.cardColors(
             containerColor = WhiteFoam
@@ -250,7 +254,7 @@ fun SpotDetailsCard(spot: Spot) {
                 )
 
                 Row(
-                    modifier = Modifier.width(170.dp),
+                    modifier = Modifier.width(184.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
@@ -295,6 +299,7 @@ fun SpotDetailsCard(spot: Spot) {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 fun formatDate(dateString: String): String {
     return try {
         val parser = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.ENGLISH)
