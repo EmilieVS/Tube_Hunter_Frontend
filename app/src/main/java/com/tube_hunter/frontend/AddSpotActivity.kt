@@ -14,17 +14,16 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -142,7 +141,9 @@ fun AddSpotCard() {
         )
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth(),
             horizontalAlignment = Alignment.Start
         ) {
             Button(
@@ -199,12 +200,12 @@ fun AddSpotCard() {
                 )
             )
 
-
             Spacer(modifier = Modifier.height(48.dp))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
                     text = "DIFFICULTY",
@@ -213,14 +214,12 @@ fun AddSpotCard() {
                     fontWeight = FontWeight.Bold,
                     fontFamily = quicksand
                 )
-                DropdownMenu()
-
-//                Text(
-//                    text = "Difficulty",
-//                    fontSize = 16.sp,
-//                    color = DeepBlue,
-//                    fontFamily = quicksand
-//                )
+                Surface (
+                    shape = RoundedCornerShape(12.dp),
+                    color = LagoonBlue
+                ){
+                    DropdownMenu()
+                }
             }
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -304,8 +303,6 @@ fun AddSpotCard() {
             }
 
             Spacer(modifier = Modifier.height(24.dp))
-
-
         }
     }
 }
@@ -313,12 +310,19 @@ fun AddSpotCard() {
 @Composable
 fun DropdownMenu() {
     var expanded by remember { mutableStateOf(false) }
+    var choice by remember { mutableStateOf("Select") }
     Box(
         modifier = Modifier
-            .padding(16.dp)
+            .padding(start = 16.dp)
     ) {
-        IconButton(onClick = { expanded = !expanded }) {
-            Icon(Icons.Default.KeyboardArrowDown, contentDescription = "Difficulty")
+        Row (
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.End,
+        ){
+            Text(choice, color = WhiteFoam)
+            IconButton(onClick = { expanded = !expanded }) {
+                Icon(Icons.Default.KeyboardArrowDown, tint = WhiteFoam, contentDescription = "Difficulty")
+            }
         }
         DropdownMenu(
             expanded = expanded,
@@ -326,23 +330,33 @@ fun DropdownMenu() {
         ) {
             DropdownMenuItem(
                 text = { Text("1")  },
-                onClick = { expanded = false  }
+                onClick = {
+                    choice = "1"
+                    expanded = false }
             )
             DropdownMenuItem(
                 text = { Text("2") },
-                onClick = { expanded = false }
+                onClick = {
+                    choice = "2"
+                    expanded = false }
             )
             DropdownMenuItem(
                 text = { Text("3") },
-                onClick = { expanded = false }
+                onClick = {
+                    choice = "3"
+                    expanded = false }
             )
             DropdownMenuItem(
                 text = { Text("4") },
-                onClick = { expanded = false }
+                onClick = {
+                    choice = "4"
+                    expanded = false }
             )
             DropdownMenuItem(
                 text = { Text("5") },
-                onClick = { expanded = false }
+                onClick = {
+                    choice = "5"
+                    expanded = false }
             )
         }
     }
