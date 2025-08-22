@@ -93,7 +93,6 @@ fun SpotsList() {
                 colors = ButtonDefaults.buttonColors(WhiteFoam, Color.Black),
                 modifier = Modifier.padding(bottom = 48.dp),
             ) {
-
                 Text(
                     "Add spot",
                     fontFamily = quicksand,
@@ -208,28 +207,21 @@ fun ShowCards(spots: List<Spot>) {
         }
 }
 
-
-
-
-
 fun readJsonFromRaw(context: Context, rawResId: Int): String {
     val inputStream = context.resources.openRawResource(rawResId)
     return inputStream.bufferedReader().use { it.readText() }
 }
 
 fun parseSpots(context: Context): List<Spot> {
-    // Charger le fichier res/raw/spots.json
     val jsonString = readJsonFromRaw(context, R.raw.spots)
 
-    // Parser dans ton modèle Welcome
     val response = Json { ignoreUnknownKeys = true }
         .decodeFromString<Welcome>(jsonString)
 
-    // Transformer en liste de Spot (ton modèle d’app)
     return response.records.map { rec ->
         val f = rec.fields
         Spot(
-            photoUrl = "https://res.cloudinary.com/manawa/image/private/f_auto,c_limit,w_3840,q_auto/aykvlohikeutpdcp720o",
+            photoUrl = f.photos.firstOrNull()?.url ?: "",
             name = f.destination,
             location = f.destinationStateCountry,
             difficulty = f.difficultyLevel.toInt(),

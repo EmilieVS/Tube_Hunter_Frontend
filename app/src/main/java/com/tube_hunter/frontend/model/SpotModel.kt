@@ -37,8 +37,8 @@ data class Fields (
     @SerialName("Magic Seaweed Link")
     val magicSeaweedLink: String,
 
-    //@SerialName("Photos")
-   // val photos: List<Photo>,
+    @SerialName("Photos")
+    val photos: List<Photo>,
 
     @SerialName("Peak Surf Season Begins")
     val peakSurfSeasonBegins: String,
@@ -51,4 +51,13 @@ data class Fields (
 
     @SerialName("Address")
     val address: String
+)
+
+@Serializable
+data class Photo (
+    val id: String,
+    val url: String,
+    val filename: String,
+    val size: Long,
+    val type: String,
 )
