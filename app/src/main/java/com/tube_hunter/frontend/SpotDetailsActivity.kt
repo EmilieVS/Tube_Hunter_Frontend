@@ -35,7 +35,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
@@ -46,6 +45,9 @@ import com.tube_hunter.frontend.ui.theme.chewy
 import com.tube_hunter.frontend.ui.theme.quicksand
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 class SpotDetailsActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -186,7 +188,7 @@ fun SpotDetailsCard(spot: Spot) {
                 fontSize = 16.sp,
                 fontStyle = FontStyle.Italic,
                 fontFamily = quicksand,
-                color = DeepBlue // bleu marine leger
+                color = DeepBlue
             )
 
             Spacer(modifier = Modifier.height(48.dp))
@@ -259,7 +261,7 @@ fun SpotDetailsCard(spot: Spot) {
                         Text(
                             modifier = Modifier
                                 .padding(12.dp),
-                            text = spot.seasonBegins,
+                            text = formatDate(spot.seasonBegins),
                             fontSize = 16.sp,
                             fontWeight = FontWeight.SemiBold,
                             color = WhiteFoam,
@@ -276,11 +278,10 @@ fun SpotDetailsCard(spot: Spot) {
                         shape = RoundedCornerShape(12.dp),
                         color = LagoonBlue
                     ) {
-
                         Text(
                             modifier = Modifier
                                 .padding(12.dp),
-                            text = spot.seasonEnds,
+                            text = formatDate(spot.seasonEnds),
                             fontSize = 16.sp,
                             fontWeight = FontWeight.SemiBold,
                             color = WhiteFoam,
@@ -289,10 +290,17 @@ fun SpotDetailsCard(spot: Spot) {
                     }
                 }
             }
-
             Spacer(modifier = Modifier.height(24.dp))
-
-
         }
+    }
+}
+
+fun formatDate(dateString: String): String {
+    return try {
+        val parser = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.ENGLISH)
+        val formatter = DateTimeFormatter.ofPattern("dd MMM", Locale.ENGLISH)
+        LocalDate.parse(dateString, parser).format(formatter)
+    } catch (e: Exception) {
+        dateString
     }
 }
