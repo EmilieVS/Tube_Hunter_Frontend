@@ -28,6 +28,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -38,6 +40,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -163,7 +166,7 @@ fun AddSpotCard() {
             OutlinedTextField(
                 value = spotName,
                 onValueChange = { spotName = it },
-                label = { Text("Spot Name", color = WhiteFoam) },
+                label = { Text("Spot Name", color = WhiteFoam, fontSize = 20.sp) },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 colors = OutlinedTextFieldDefaults.colors(
@@ -198,7 +201,7 @@ fun AddSpotCard() {
                 )
             )
 
-            Spacer(modifier = Modifier.height(48.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -220,11 +223,10 @@ fun AddSpotCard() {
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-            Row(
+            Column(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
                     text = "SURF BREAK",
@@ -233,14 +235,14 @@ fun AddSpotCard() {
                     fontWeight = FontWeight.Bold,
                     fontFamily = quicksand
                 )
-                Text(
-                    text = "SurfBreak",
-                    fontSize = 16.sp,
-                    color = DeepBlue,
-                    fontFamily = quicksand
-                )
+//                Text(
+//                    text = "SurfBreak",
+//                    fontSize = 16.sp,
+//                    color = DeepBlue,
+//                    fontFamily = quicksand
+//                )
+                Checkboxes()
             }
-
 
             Spacer(modifier = Modifier.height(24.dp))
 
@@ -286,7 +288,6 @@ fun AddSpotCard() {
                         shape = RoundedCornerShape(12.dp),
                         color = LagoonBlue
                     ) {
-
                         Text(
                             modifier = Modifier
                                 .padding(12.dp),
@@ -300,73 +301,7 @@ fun AddSpotCard() {
                 }
             }
         }
-
         Spacer(modifier = Modifier.height(24.dp))
-    }
-}
-
-
-@Composable
-fun DropdownMenu() {
-    var expanded by remember { mutableStateOf(false) }
-    var choice by remember { mutableStateOf("Select") }
-    Box(
-        modifier = Modifier
-            .padding(start = 16.dp)
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.End,
-        ) {
-            Text(choice, color = WhiteFoam)
-            IconButton(onClick = { expanded = !expanded }) {
-                Icon(
-                    Icons.Default.KeyboardArrowDown,
-                    tint = WhiteFoam,
-                    contentDescription = "Difficulty"
-                )
-            }
-        }
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false }
-        ) {
-            DropdownMenuItem(
-                text = { Text("1") },
-                onClick = {
-                    choice = "1"
-                    expanded = false
-                }
-            )
-            DropdownMenuItem(
-                text = { Text("2") },
-                onClick = {
-                    choice = "2"
-                    expanded = false
-                }
-            )
-            DropdownMenuItem(
-                text = { Text("3") },
-                onClick = {
-                    choice = "3"
-                    expanded = false
-                }
-            )
-            DropdownMenuItem(
-                text = { Text("4") },
-                onClick = {
-                    choice = "4"
-                    expanded = false
-                }
-            )
-            DropdownMenuItem(
-                text = { Text("5") },
-                onClick = {
-                    choice = "5"
-                    expanded = false
-                }
-            )
-        }
     }
 }
 
@@ -400,7 +335,7 @@ fun AddImage(
                     modifier = Modifier.size(48.dp)
                 )
                 Text(
-                    text = "Ajouter une image",
+                    text = "Add image",
                     color = WhiteFoam,
                     fontFamily = quicksand,
                     fontSize = 16.sp
@@ -409,5 +344,83 @@ fun AddImage(
         }
     }
 }
+
+@Composable
+fun DropdownMenu() {
+    var expanded by remember { mutableStateOf(false) }
+    var choice by remember { mutableStateOf("Select") }
+    Box(
+        modifier = Modifier
+            .padding(start = 16.dp)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.End,
+        ) {
+            Text(choice, color = WhiteFoam)
+            IconButton(onClick = { expanded = !expanded }) {
+                Icon(
+                    Icons.Default.KeyboardArrowDown,
+                    tint = WhiteFoam,
+                    contentDescription = "Difficulty"
+                )
+            }
+        }
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+        ) {
+            listOf("1", "2", "3", "4", "5").forEach { value ->
+                DropdownMenuItem(
+                    text = {
+                        Text(
+                            value,
+                            fontSize = 14.sp,
+                            modifier = Modifier.padding(4.dp)
+                        )
+                    },
+                    onClick = {
+                        choice = value
+                        expanded = false
+                    },
+                    modifier = Modifier
+                        .height(32.dp)
+                        .width(60.dp)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun Checkboxes() {
+    val checkedOptions = remember { mutableStateListOf(false, false, false) }
+    val labels = listOf("Beach", "Reef", "Point")
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+    ) {
+        labels.forEachIndexed { index, label ->
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Checkbox(
+                    checked = checkedOptions[index],
+                    onCheckedChange = { isChecked ->
+                        checkedOptions[index] = isChecked
+                    },
+                    colors = CheckboxDefaults.colors(
+                        checkedColor = LagoonBlue,
+                        uncheckedColor = LagoonBlue,
+                        checkmarkColor = WhiteFoam
+                    ),
+                )
+                Text(label)
+            }
+        }
+    }
+}
+
 
 
