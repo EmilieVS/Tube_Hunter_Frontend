@@ -1,11 +1,14 @@
 package com.tube_hunter.frontend
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,6 +19,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -24,6 +28,10 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.PhotoCamera
+import androidx.compose.material.icons.rounded.AddPhotoAlternate
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -39,6 +47,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -46,10 +55,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.rememberAsyncImagePainter
 import com.tube_hunter.frontend.ui.theme.DeepBlue
 import com.tube_hunter.frontend.ui.theme.LagoonBlue
 import com.tube_hunter.frontend.ui.theme.WhiteFoam
 import com.tube_hunter.frontend.ui.theme.quicksand
+
+
 
 
 class AddSpotActivity : ComponentActivity() {
@@ -57,7 +69,7 @@ class AddSpotActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-           Background()
+            Background()
         }
     }
 }
@@ -75,11 +87,11 @@ fun Background(){
             modifier = Modifier.matchParentSize()
         )
         Column(
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.SpaceBetween
+            modifier = Modifier
+                .align(Alignment.Center)
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceBetween
         ) {
             BrandTitle()
             AddSpotCard()
@@ -128,6 +140,7 @@ fun Background(){
 fun AddSpotCard() {
     var spotName by remember { mutableStateOf("") }
     var location by remember { mutableStateOf("") }
+    var imageUri by remember { mutableStateOf<Uri?>(null) }
 
     Card(
         modifier = Modifier
@@ -146,59 +159,55 @@ fun AddSpotCard() {
                 .fillMaxWidth(),
             horizontalAlignment = Alignment.Start
         ) {
-            Button(
-                onClick = {},
-                colors = ButtonDefaults.buttonColors(LagoonBlue, WhiteFoam),
 
-            ) {
-                Text(
-                    text = "Add Image",
-                    fontFamily = quicksand,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
 
-            Spacer(modifier = Modifier.height(8.dp))
 
-            OutlinedTextField(
-                value = spotName,
-                onValueChange = { spotName = it },
-                label = { Text("Spot Name", color = WhiteFoam) },
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = DeepBlue,
-                    unfocusedBorderColor = LagoonBlue,
-                    focusedLabelColor = WhiteFoam,
-                    unfocusedLabelColor = WhiteFoam,
-                    focusedContainerColor = LagoonBlue,
-                    unfocusedContainerColor = LagoonBlue,
-                    focusedTextColor = WhiteFoam,
-                    unfocusedTextColor = WhiteFoam,
-                )
+            AddImage(
+                imageUri = imageUri,
+                onClick = {}
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+        }
 
-            // TextField pour la localisation
-            OutlinedTextField(
-                value = location,
-                onValueChange = { location = it },
-                label = { Text("Location", color = WhiteFoam) },
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = DeepBlue,
-                    unfocusedBorderColor = LagoonBlue,
-                    focusedLabelColor = WhiteFoam,
-                    unfocusedLabelColor = WhiteFoam,
-                    focusedContainerColor = LagoonBlue,
-                    unfocusedContainerColor = LagoonBlue,
-                    focusedTextColor = WhiteFoam,
-                    unfocusedTextColor = WhiteFoam,
-                )
+        Spacer(modifier = Modifier.height(8.dp))
+
+        OutlinedTextField(
+            value = spotName,
+            onValueChange = { spotName = it },
+            label = { Text("Spot Name", color = WhiteFoam) },
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = DeepBlue,
+                unfocusedBorderColor = LagoonBlue,
+                focusedLabelColor = WhiteFoam,
+                unfocusedLabelColor = WhiteFoam,
+                focusedContainerColor = LagoonBlue,
+                unfocusedContainerColor = LagoonBlue,
+                focusedTextColor = WhiteFoam,
+                unfocusedTextColor = WhiteFoam,
             )
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        OutlinedTextField(
+            value = location,
+            onValueChange = { location = it },
+            label = { Text("Location", color = WhiteFoam) },
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = DeepBlue,
+                unfocusedBorderColor = LagoonBlue,
+                focusedLabelColor = WhiteFoam,
+                unfocusedLabelColor = WhiteFoam,
+                focusedContainerColor = LagoonBlue,
+                unfocusedContainerColor = LagoonBlue,
+                focusedTextColor = WhiteFoam,
+                unfocusedTextColor = WhiteFoam,
+            )
+        )
 
             Spacer(modifier = Modifier.height(48.dp))
 
@@ -222,90 +231,90 @@ fun AddSpotCard() {
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = "SURF BREAK",
+                fontSize = 16.sp,
+                color = DeepBlue,
+                fontWeight = FontWeight.Bold,
+                fontFamily = quicksand
+            )
+            Text(
+                text = "SurfBreak",
+                fontSize = 16.sp,
+                color = DeepBlue,
+                fontFamily = quicksand
+            )
+        }
+
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.Top,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = "SEASON",
+                fontSize = 16.sp,
+                color = DeepBlue,
+                fontWeight = FontWeight.Bold,
+                fontFamily = quicksand
+            )
 
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.width(170.dp),
+                verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(
-                    text = "SURF BREAK",
-                    fontSize = 16.sp,
-                    color = DeepBlue,
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = quicksand
-                )
-                Text(
-                    text = "SurfBreak",
-                    fontSize = 16.sp,
-                    color = DeepBlue,
-                    fontFamily = quicksand
-                )
-            }
-
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.Top,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = "SEASON",
-                    fontSize = 16.sp,
-                    color = DeepBlue,
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = quicksand
-                )
-
-                Row(
-                    modifier = Modifier.width(170.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
+                Surface(
+                    shape = RoundedCornerShape(12.dp),
+                    color = LagoonBlue
                 ) {
-                    Surface(
-                        shape = RoundedCornerShape(12.dp),
-                        color = LagoonBlue
-                    ) {
-                        Text(
-                            modifier = Modifier
-                                .padding(12.dp),
-                            text = "start",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = WhiteFoam,
-                            fontFamily = quicksand
-                        )
-                    }
-                    Image(
-                        painter = painterResource(id = R.drawable.arrow_right_bold),
-                        contentDescription = "Right Arrow",
+                    Text(
                         modifier = Modifier
-                            .height(16.dp),
+                            .padding(12.dp),
+                        text = "start",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = WhiteFoam,
+                        fontFamily = quicksand
                     )
-                    Surface(
-                        shape = RoundedCornerShape(12.dp),
-                        color = LagoonBlue
-                    ) {
+                }
+                Image(
+                    painter = painterResource(id = R.drawable.arrow_right_bold),
+                    contentDescription = "Right Arrow",
+                    modifier = Modifier
+                        .height(16.dp),
+                )
+                Surface(
+                    shape = RoundedCornerShape(12.dp),
+                    color = LagoonBlue
+                ) {
 
-                        Text(
-                            modifier = Modifier
-                                .padding(12.dp),
-                            text = "end",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = WhiteFoam,
-                            fontFamily = quicksand
-                        )
-                    }
+                    Text(
+                        modifier = Modifier
+                            .padding(12.dp),
+                        text = "end",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = WhiteFoam,
+                        fontFamily = quicksand
+                    )
                 }
             }
-
-            Spacer(modifier = Modifier.height(24.dp))
         }
+
+        Spacer(modifier = Modifier.height(24.dp))
     }
 }
+
 
 @Composable
 fun DropdownMenu() {
@@ -358,6 +367,46 @@ fun DropdownMenu() {
                     choice = "5"
                     expanded = false }
             )
+        }
+    }
+}
+
+@Composable
+fun AddImage(
+    imageUri: Uri?,
+    onClick: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(180.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .background(LagoonBlue)
+            .clickable { onClick() },
+        contentAlignment = Alignment.Center
+    ) {
+        if (imageUri != null) {
+            Image(
+                painter = rememberAsyncImagePainter(imageUri),
+                contentDescription = "Selected Image",
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
+        } else {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Icon(
+                    imageVector = Icons.Default.PhotoCamera,
+                    contentDescription = "Add Image",
+                    tint = WhiteFoam,
+                    modifier = Modifier.size(48.dp)
+                )
+                Text(
+                    text = "Ajouter une image",
+                    color = WhiteFoam,
+                    fontFamily = quicksand,
+                    fontSize = 16.sp
+                )
+            }
         }
     }
 }
