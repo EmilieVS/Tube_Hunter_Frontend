@@ -110,7 +110,7 @@ fun SpotCard(spot: Spot) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 40.dp)
+            .padding(horizontal = 24.dp)
             .clickable {
                 val intent = Intent(context, SpotDetailsActivity::class.java)
                 intent.putExtra("spot", spot)
