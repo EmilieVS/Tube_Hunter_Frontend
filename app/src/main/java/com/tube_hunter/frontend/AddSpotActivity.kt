@@ -17,21 +17,17 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.PhotoCamera
-import androidx.compose.material.icons.rounded.AddPhotoAlternate
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -62,8 +58,6 @@ import com.tube_hunter.frontend.ui.theme.WhiteFoam
 import com.tube_hunter.frontend.ui.theme.quicksand
 
 
-
-
 class AddSpotActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -76,7 +70,7 @@ class AddSpotActivity : ComponentActivity() {
 
 @Preview
 @Composable
-fun Background(){
+fun Background() {
     Box(
         modifier = Modifier.fillMaxSize(),
     ) {
@@ -96,7 +90,7 @@ fun Background(){
             BrandTitle()
             AddSpotCard()
             val context = LocalContext.current
-            Row{
+            Row {
                 Button(
                     onClick = {
                         val intent = Intent(context, SpotsListActivity::class.java)
@@ -159,55 +153,50 @@ fun AddSpotCard() {
                 .fillMaxWidth(),
             horizontalAlignment = Alignment.Start
         ) {
-
-
-
             AddImage(
                 imageUri = imageUri,
                 onClick = {}
             )
 
-        }
+            Spacer(modifier = Modifier.height(8.dp))
 
-        Spacer(modifier = Modifier.height(8.dp))
-
-        OutlinedTextField(
-            value = spotName,
-            onValueChange = { spotName = it },
-            label = { Text("Spot Name", color = WhiteFoam) },
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = DeepBlue,
-                unfocusedBorderColor = LagoonBlue,
-                focusedLabelColor = WhiteFoam,
-                unfocusedLabelColor = WhiteFoam,
-                focusedContainerColor = LagoonBlue,
-                unfocusedContainerColor = LagoonBlue,
-                focusedTextColor = WhiteFoam,
-                unfocusedTextColor = WhiteFoam,
+            OutlinedTextField(
+                value = spotName,
+                onValueChange = { spotName = it },
+                label = { Text("Spot Name", color = WhiteFoam) },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = DeepBlue,
+                    unfocusedBorderColor = LagoonBlue,
+                    focusedLabelColor = WhiteFoam,
+                    unfocusedLabelColor = WhiteFoam,
+                    focusedContainerColor = LagoonBlue,
+                    unfocusedContainerColor = LagoonBlue,
+                    focusedTextColor = WhiteFoam,
+                    unfocusedTextColor = WhiteFoam,
+                )
             )
-        )
 
-        Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
-        OutlinedTextField(
-            value = location,
-            onValueChange = { location = it },
-            label = { Text("Location", color = WhiteFoam) },
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = DeepBlue,
-                unfocusedBorderColor = LagoonBlue,
-                focusedLabelColor = WhiteFoam,
-                unfocusedLabelColor = WhiteFoam,
-                focusedContainerColor = LagoonBlue,
-                unfocusedContainerColor = LagoonBlue,
-                focusedTextColor = WhiteFoam,
-                unfocusedTextColor = WhiteFoam,
+            OutlinedTextField(
+                value = location,
+                onValueChange = { location = it },
+                label = { Text("Location", color = WhiteFoam) },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = DeepBlue,
+                    unfocusedBorderColor = LagoonBlue,
+                    focusedLabelColor = WhiteFoam,
+                    unfocusedLabelColor = WhiteFoam,
+                    focusedContainerColor = LagoonBlue,
+                    unfocusedContainerColor = LagoonBlue,
+                    focusedTextColor = WhiteFoam,
+                    unfocusedTextColor = WhiteFoam,
+                )
             )
-        )
 
             Spacer(modifier = Modifier.height(48.dp))
 
@@ -223,90 +212,91 @@ fun AddSpotCard() {
                     fontWeight = FontWeight.Bold,
                     fontFamily = quicksand
                 )
-                Surface (
+                Surface(
                     shape = RoundedCornerShape(12.dp),
                     color = LagoonBlue
-                ){
+                ) {
                     DropdownMenu()
                 }
             }
 
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = "SURF BREAK",
-                fontSize = 16.sp,
-                color = DeepBlue,
-                fontWeight = FontWeight.Bold,
-                fontFamily = quicksand
-            )
-            Text(
-                text = "SurfBreak",
-                fontSize = 16.sp,
-                color = DeepBlue,
-                fontFamily = quicksand
-            )
-        }
-
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.Top,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = "SEASON",
-                fontSize = 16.sp,
-                color = DeepBlue,
-                fontWeight = FontWeight.Bold,
-                fontFamily = quicksand
-            )
+            Spacer(modifier = Modifier.height(24.dp))
 
             Row(
-                modifier = Modifier.width(170.dp),
-                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Surface(
-                    shape = RoundedCornerShape(12.dp),
-                    color = LagoonBlue
-                ) {
-                    Text(
-                        modifier = Modifier
-                            .padding(12.dp),
-                        text = "start",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = WhiteFoam,
-                        fontFamily = quicksand
-                    )
-                }
-                Image(
-                    painter = painterResource(id = R.drawable.arrow_right_bold),
-                    contentDescription = "Right Arrow",
-                    modifier = Modifier
-                        .height(16.dp),
+                Text(
+                    text = "SURF BREAK",
+                    fontSize = 16.sp,
+                    color = DeepBlue,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = quicksand
                 )
-                Surface(
-                    shape = RoundedCornerShape(12.dp),
-                    color = LagoonBlue
-                ) {
+                Text(
+                    text = "SurfBreak",
+                    fontSize = 16.sp,
+                    color = DeepBlue,
+                    fontFamily = quicksand
+                )
+            }
 
-                    Text(
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.Top,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "SEASON",
+                    fontSize = 16.sp,
+                    color = DeepBlue,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = quicksand
+                )
+
+                Row(
+                    modifier = Modifier.width(170.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Surface(
+                        shape = RoundedCornerShape(12.dp),
+                        color = LagoonBlue
+                    ) {
+                        Text(
+                            modifier = Modifier
+                                .padding(12.dp),
+                            text = "start",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = WhiteFoam,
+                            fontFamily = quicksand
+                        )
+                    }
+                    Image(
+                        painter = painterResource(id = R.drawable.arrow_right_bold),
+                        contentDescription = "Right Arrow",
                         modifier = Modifier
-                            .padding(12.dp),
-                        text = "end",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = WhiteFoam,
-                        fontFamily = quicksand
+                            .height(16.dp),
                     )
+                    Surface(
+                        shape = RoundedCornerShape(12.dp),
+                        color = LagoonBlue
+                    ) {
+
+                        Text(
+                            modifier = Modifier
+                                .padding(12.dp),
+                            text = "end",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = WhiteFoam,
+                            fontFamily = quicksand
+                        )
+                    }
                 }
             }
         }
@@ -324,13 +314,17 @@ fun DropdownMenu() {
         modifier = Modifier
             .padding(start = 16.dp)
     ) {
-        Row (
+        Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.End,
-        ){
+        ) {
             Text(choice, color = WhiteFoam)
             IconButton(onClick = { expanded = !expanded }) {
-                Icon(Icons.Default.KeyboardArrowDown, tint = WhiteFoam, contentDescription = "Difficulty")
+                Icon(
+                    Icons.Default.KeyboardArrowDown,
+                    tint = WhiteFoam,
+                    contentDescription = "Difficulty"
+                )
             }
         }
         DropdownMenu(
@@ -338,34 +332,39 @@ fun DropdownMenu() {
             onDismissRequest = { expanded = false }
         ) {
             DropdownMenuItem(
-                text = { Text("1")  },
+                text = { Text("1") },
                 onClick = {
                     choice = "1"
-                    expanded = false }
+                    expanded = false
+                }
             )
             DropdownMenuItem(
                 text = { Text("2") },
                 onClick = {
                     choice = "2"
-                    expanded = false }
+                    expanded = false
+                }
             )
             DropdownMenuItem(
                 text = { Text("3") },
                 onClick = {
                     choice = "3"
-                    expanded = false }
+                    expanded = false
+                }
             )
             DropdownMenuItem(
                 text = { Text("4") },
                 onClick = {
                     choice = "4"
-                    expanded = false }
+                    expanded = false
+                }
             )
             DropdownMenuItem(
                 text = { Text("5") },
                 onClick = {
                     choice = "5"
-                    expanded = false }
+                    expanded = false
+                }
             )
         }
     }
