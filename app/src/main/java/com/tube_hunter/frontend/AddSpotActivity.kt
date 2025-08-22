@@ -6,7 +6,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,22 +15,27 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -40,6 +44,7 @@ import com.tube_hunter.frontend.ui.theme.DeepBlue
 import com.tube_hunter.frontend.ui.theme.LagoonBlue
 import com.tube_hunter.frontend.ui.theme.WhiteFoam
 import com.tube_hunter.frontend.ui.theme.quicksand
+
 
 class AddSpotActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -115,6 +120,9 @@ fun Background(){
 
 @Composable
 fun AddSpotCard() {
+    var spotName by remember { mutableStateOf("") }
+    var location by remember { mutableStateOf("") }
+
     Card(
         modifier = Modifier
             .padding(horizontal = 40.dp)
@@ -132,12 +140,11 @@ fun AddSpotCard() {
         ) {
             Button(
                 onClick = {},
-                colors = ButtonDefaults.buttonColors(DeepBlue, WhiteFoam),
-                modifier = Modifier
-                    .size(100.dp),
+                colors = ButtonDefaults.buttonColors(LagoonBlue, WhiteFoam),
+
             ) {
                 Text(
-                    text = "+",
+                    text = "Add Image",
                     fontFamily = quicksand,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
@@ -146,23 +153,45 @@ fun AddSpotCard() {
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            Text(
-                text = "Name of the spot",
-                fontSize = 32.sp,
-                fontFamily = quicksand,
-                fontWeight = FontWeight.Bold,
-                color = DeepBlue
+            OutlinedTextField(
+                value = spotName,
+                onValueChange = { spotName = it },
+                label = { Text("Spot Name", color = WhiteFoam) },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = DeepBlue,
+                    unfocusedBorderColor = LagoonBlue,
+                    focusedLabelColor = WhiteFoam,
+                    unfocusedLabelColor = WhiteFoam,
+                    focusedContainerColor = LagoonBlue,
+                    unfocusedContainerColor = LagoonBlue,
+                    focusedTextColor = WhiteFoam,
+                    unfocusedTextColor = WhiteFoam,
+                )
             )
 
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
-            Text(
-                text = "Location",
-                fontSize = 16.sp,
-                fontStyle = FontStyle.Italic,
-                fontFamily = quicksand,
-                color = DeepBlue // bleu marine leger
+            // TextField pour la localisation
+            OutlinedTextField(
+                value = location,
+                onValueChange = { location = it },
+                label = { Text("Location", color = WhiteFoam) },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = DeepBlue,
+                    unfocusedBorderColor = LagoonBlue,
+                    focusedLabelColor = WhiteFoam,
+                    unfocusedLabelColor = WhiteFoam,
+                    focusedContainerColor = LagoonBlue,
+                    unfocusedContainerColor = LagoonBlue,
+                    focusedTextColor = WhiteFoam,
+                    unfocusedTextColor = WhiteFoam,
+                )
             )
+
 
             Spacer(modifier = Modifier.height(48.dp))
 
@@ -177,6 +206,7 @@ fun AddSpotCard() {
                     fontWeight = FontWeight.Bold,
                     fontFamily = quicksand
                 )
+
                 Text(
                     text = "Difficulty",
                     fontSize = 16.sp,
@@ -271,4 +301,20 @@ fun AddSpotCard() {
         }
     }
 }
+
+@Composable
+fun CheckboxDifficulty() {
+    var checked by remember { mutableStateOf(true) }
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text("Difficulty")
+        Checkbox(
+            checked = checked,
+            onCheckedChange = { checked = it }
+        )
+    }
+}
+
 
