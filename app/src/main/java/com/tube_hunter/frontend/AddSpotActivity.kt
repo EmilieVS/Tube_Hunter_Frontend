@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.tube_hunter.frontend
 
 import android.content.Intent
@@ -30,14 +32,19 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -59,6 +66,9 @@ import com.tube_hunter.frontend.ui.theme.DeepBlue
 import com.tube_hunter.frontend.ui.theme.LagoonBlue
 import com.tube_hunter.frontend.ui.theme.WhiteFoam
 import com.tube_hunter.frontend.ui.theme.quicksand
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 
 class AddSpotActivity : ComponentActivity() {
@@ -235,12 +245,6 @@ fun AddSpotCard() {
                     fontWeight = FontWeight.Bold,
                     fontFamily = quicksand
                 )
-//                Text(
-//                    text = "SurfBreak",
-//                    fontSize = 16.sp,
-//                    color = DeepBlue,
-//                    fontFamily = quicksand
-//                )
                 Checkboxes()
             }
 
@@ -248,8 +252,8 @@ fun AddSpotCard() {
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.Top,
-                horizontalArrangement = Arrangement.SpaceBetween
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Absolute.SpaceBetween
             ) {
                 Text(
                     text = "SEASON",
@@ -258,52 +262,12 @@ fun AddSpotCard() {
                     fontWeight = FontWeight.Bold,
                     fontFamily = quicksand
                 )
-
-                Row(
-                    modifier = Modifier.width(170.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Surface(
-                        shape = RoundedCornerShape(12.dp),
-                        color = LagoonBlue
-                    ) {
-                        Text(
-                            modifier = Modifier
-                                .padding(12.dp),
-                            text = "start",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = WhiteFoam,
-                            fontFamily = quicksand
-                        )
-                    }
-                    Image(
-                        painter = painterResource(id = R.drawable.arrow_right_bold),
-                        contentDescription = "Right Arrow",
-                        modifier = Modifier
-                            .height(16.dp),
-                    )
-                    Surface(
-                        shape = RoundedCornerShape(12.dp),
-                        color = LagoonBlue
-                    ) {
-                        Text(
-                            modifier = Modifier
-                                .padding(12.dp),
-                            text = "end",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = WhiteFoam,
-                            fontFamily = quicksand
-                        )
-                    }
+                SeasonDatePicker()
                 }
             }
         }
         Spacer(modifier = Modifier.height(24.dp))
     }
-}
 
 @Composable
 fun AddImage(
@@ -421,6 +385,121 @@ fun Checkboxes() {
         }
     }
 }
+
+
+@Composable
+fun DatePickerModal(
+    onDateSelected: (Long?) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val datePickerState = rememberDatePickerState()
+
+    DatePickerDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            TextButton(onClick = {
+                onDateSelected(datePickerState.selectedDateMillis)
+                onDismiss()
+            }) {
+                Text("OK")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        }
+    ) {
+        DatePicker(state = datePickerState)
+    }
+}
+
+
+@Composable
+fun SeasonDatePicker() {
+    var startDatePicker by remember { mutableStateOf(false) }
+    var endDatePicker by remember { mutableStateOf(false) }
+
+    var startDate by remember { mutableStateOf<Long?>(null) }
+    var endDate by remember { mutableStateOf<Long?>(null) }
+
+    Row(
+        modifier = Modifier.width(170.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Surface(
+            shape = RoundedCornerShape(12.dp),
+            color = LagoonBlue,
+            modifier = Modifier
+                .width(72.dp) // pour garder le style des boutons: /!\ Rendre responsive !
+                .clickable { startDatePicker = true }
+        ) {
+            Text(
+                modifier = Modifier.padding(12.dp),
+                text = startDate?.let { convertMillisToDate(it) } ?: "start",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = WhiteFoam,
+                fontFamily = quicksand,
+                maxLines = 1
+            )
+        }
+
+        Image(
+            painter = painterResource(id = R.drawable.arrow_right_bold),
+            contentDescription = "Right Arrow",
+            modifier = Modifier.height(16.dp)
+        )
+
+        Surface(
+            shape = RoundedCornerShape(12.dp),
+            color = LagoonBlue,
+            modifier = Modifier
+                .width(72.dp)
+                .clickable { endDatePicker = true }
+        ) {
+            Text(
+                modifier = Modifier.padding(12.dp),
+                text = endDate?.let { convertMillisToDate(it) } ?: "end",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = WhiteFoam,
+                fontFamily = quicksand,
+                maxLines = 1
+            )
+        }
+    }
+
+    if (startDatePicker) {
+        DatePickerModal(
+            onDateSelected = {
+                startDate = it
+                startDatePicker = false
+            },
+            onDismiss = { startDatePicker = false }
+        )
+    }
+
+    if (endDatePicker) {
+        DatePickerModal(
+            onDateSelected = {
+                endDate = it
+                endDatePicker = false
+            },
+            onDismiss = { endDatePicker = false }
+        )
+    }
+}
+
+
+
+@Composable
+fun convertMillisToDate(millis: Long): String {
+    val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+    return formatter.format(Date(millis))
+}
+
 
 
 
