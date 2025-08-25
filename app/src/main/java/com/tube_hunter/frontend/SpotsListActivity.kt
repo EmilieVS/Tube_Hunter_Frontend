@@ -120,7 +120,7 @@ fun SpotCard(spot: Spot) {
             containerColor = WhiteFoam,
         ),
         elevation = CardDefaults.cardElevation(
-            defaultElevation = 6.dp
+            defaultElevation = 8.dp
         )
     ) {
         Column (
