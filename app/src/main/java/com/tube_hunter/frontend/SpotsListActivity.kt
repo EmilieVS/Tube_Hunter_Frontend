@@ -168,33 +168,11 @@ fun SpotCard(spot: Spot) {
 
                 )
                 Row {
-                    DifficultyFilledImage()
-                    DifficultyFilledImage()
-                    DifficultyFilledImage()
-                    DifficultyFilledImage()
-                    DifficultyImage()
+                    IconDifficulty(2)
                 }
             }
         }
     }
-}
-
-@Composable
-fun DifficultyImage() {
-    Image(
-        painter = painterResource(id = R.drawable.person_simple_snowboard_bold),
-        contentDescription = null,
-        modifier = Modifier.size(width = 18.dp, height = 18.dp)
-    )
-}
-
-@Composable
-fun DifficultyFilledImage() {
-    Image(
-        painter = painterResource(id = R.drawable.person_simple_snowboard_fill),
-        contentDescription = null,
-        modifier = Modifier.size(width = 18.dp, height = 18.dp)
-    )
 }
 
 @Composable
