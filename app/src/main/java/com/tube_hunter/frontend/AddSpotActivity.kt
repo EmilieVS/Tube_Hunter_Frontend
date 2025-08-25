@@ -58,6 +58,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -151,13 +152,13 @@ fun AddSpotCard() {
 
     Card(
         modifier = Modifier
-            .padding(horizontal = 40.dp)
+            .padding(horizontal = 24.dp)
             .fillMaxWidth(),
         colors = CardDefaults.cardColors(
             containerColor = WhiteFoam
         ),
         elevation = CardDefaults.cardElevation(
-            defaultElevation = 6.dp
+            defaultElevation = 8.dp
         )
     ) {
         Column(
@@ -424,7 +425,7 @@ fun SeasonDatePicker() {
     var endDate by remember { mutableStateOf<Long?>(null) }
 
     Row(
-        modifier = Modifier.width(170.dp),
+        modifier = Modifier.width(184.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
@@ -437,6 +438,7 @@ fun SeasonDatePicker() {
         ) {
             Text(
                 modifier = Modifier.padding(12.dp),
+                textAlign = TextAlign.Center,
                 text = startDate?.let { convertMillisToDate(it) } ?: "start",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.SemiBold,
@@ -461,6 +463,7 @@ fun SeasonDatePicker() {
         ) {
             Text(
                 modifier = Modifier.padding(12.dp),
+                textAlign = TextAlign.Center,
                 text = endDate?.let { convertMillisToDate(it) } ?: "end",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.SemiBold,
@@ -496,7 +499,7 @@ fun SeasonDatePicker() {
 
 @Composable
 fun convertMillisToDate(millis: Long): String {
-    val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+    val formatter = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault())
     return formatter.format(Date(millis))
 }
 
