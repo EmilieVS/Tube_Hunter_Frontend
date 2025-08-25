@@ -1,15 +1,16 @@
 package com.tube_hunter.frontend
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -40,9 +41,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
+import com.tube_hunter.frontend.model.Welcome
 import com.tube_hunter.frontend.ui.theme.DeepBlue
 import com.tube_hunter.frontend.ui.theme.WhiteFoam
 import com.tube_hunter.frontend.ui.theme.quicksand
+import kotlinx.serialization.json.Json
 
 class SpotsListActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,8 +57,6 @@ class SpotsListActivity : ComponentActivity() {
             }
         }
     }
-
-
 
 @Preview
 @Composable
@@ -78,39 +80,11 @@ fun SpotsList() {
         ) {
             BrandTitle()
 
-            val spots = listOf(
-                Spot(
-                    photoUrl = "https://res.cloudinary.com/manawa/image/private/f_auto,c_limit,w_3840,q_auto/aykvlohikeutpdcp720o",
-                    name = "Cowabunga",
-                    location = "Biscarosse, France",
-                    difficulty = 3,
-                    surfBreak = "Reef Break",
-                    seasonBegins = "03 Jul",
-                    seasonEnds = "30 Oct"
-                ),
-                Spot(
-                    photoUrl = "https://res.cloudinary.com/manawa/image/private/f_auto,c_limit,w_3840,q_auto/aykvlohikeutpdcp720o",
-                    name = "Nice",
-                    location = "Nice, France",
-                    difficulty = 1,
-                    surfBreak = "Beach Break",
-                    seasonBegins = "01 Aug",
-                    seasonEnds = "20 Nov"
-                ),
-                Spot(
-                    photoUrl = "https://res.cloudinary.com/manawa/image/private/f_auto,c_limit,w_3840,q_auto/aykvlohikeutpdcp720o",
-                    name = "Waikikki",
-                    location = "tehaupopo, France",
-                    difficulty = 5,
-                    surfBreak = "Point Break",
-                    seasonBegins = "02 Jul",
-                    seasonEnds = "20 Oct"
-                )
-            )
+            val context = LocalContext.current
+            val spots = parseSpots(context)
 
             ShowCards(spots)
 
-            val context = LocalContext.current
             Button(
                 onClick = {
                     val intent = Intent(context, SpotDetailsActivity::class.java)
@@ -119,7 +93,6 @@ fun SpotsList() {
                 colors = ButtonDefaults.buttonColors(WhiteFoam, Color.Black),
                 modifier = Modifier.padding(bottom = 48.dp),
             ) {
-
                 Text(
                     "Add spot",
                     fontFamily = quicksand,
@@ -131,13 +104,18 @@ fun SpotsList() {
     }
 }
 
-
 @Composable
 fun SpotCard(spot: Spot) {
+    val context = LocalContext.current
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 40.dp),
+            .padding(horizontal = 24.dp)
+            .clickable {
+                val intent = Intent(context, SpotDetailsActivity::class.java)
+                intent.putExtra("spot", spot)
+                context.startActivity(intent)
+    },
         colors = CardDefaults.cardColors(
             containerColor = WhiteFoam,
         ),
@@ -149,9 +127,9 @@ fun SpotCard(spot: Spot) {
             modifier = Modifier.padding(16.dp),
             horizontalAlignment = Alignment.Start
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.sunset_wave),
-                contentDescription = "Spot Photo",
+            AsyncImage(
+                model = spot.photoUrl,
+                contentDescription = spot.name,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -222,12 +200,36 @@ fun ShowCards(spots: List<Spot>) {
                 .fillMaxWidth()
                 .fillMaxHeight(0.80f),
             verticalArrangement = Arrangement.spacedBy(16.dp)
-
         ) {
             items(spots) { spot ->
                 SpotCard(spot)
             }
         }
-
 }
+
+fun readJsonFromRaw(context: Context, rawResId: Int): String {
+    val inputStream = context.resources.openRawResource(rawResId)
+    return inputStream.bufferedReader().use { it.readText() }
+}
+
+fun parseSpots(context: Context): List<Spot> {
+    val jsonString = readJsonFromRaw(context, R.raw.spots)
+
+    val response = Json { ignoreUnknownKeys = true }
+        .decodeFromString<Welcome>(jsonString)
+
+    return response.records.map { rec ->
+        val f = rec.fields
+        Spot(
+            photoUrl = f.photos.firstOrNull()?.url ?: "",
+            name = f.destination,
+            location = f.destinationStateCountry,
+            difficulty = f.difficultyLevel.toInt(),
+            surfBreak = f.surfBreak.firstOrNull() ?: "",
+            seasonBegins = f.peakSurfSeasonBegins,
+            seasonEnds = f.peakSurfSeasonEnds
+        )
+    }
+}
+
 

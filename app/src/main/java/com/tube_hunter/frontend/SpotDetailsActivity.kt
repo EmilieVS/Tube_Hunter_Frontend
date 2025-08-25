@@ -2,6 +2,7 @@ package com.tube_hunter.frontend
 
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -35,7 +36,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
@@ -44,20 +44,29 @@ import com.tube_hunter.frontend.ui.theme.LagoonBlue
 import com.tube_hunter.frontend.ui.theme.WhiteFoam
 import com.tube_hunter.frontend.ui.theme.chewy
 import com.tube_hunter.frontend.ui.theme.quicksand
+import android.os.Parcelable
+import androidx.annotation.RequiresApi
+import androidx.compose.ui.tooling.preview.Preview
+import kotlinx.parcelize.Parcelize
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 class SpotDetailsActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        val spot = intent.getParcelableExtra<Spot>("spot")
         setContent {
-            SpotDetails()
+            spot?.let {
+                SpotDetails(it)
+            }
         }
     }
 }
 
-@Preview
 @Composable
-fun SpotDetails() {
+fun SpotDetails(spot: Spot) {
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -77,15 +86,6 @@ fun SpotDetails() {
         ) {
             BrandTitle()
 
-            val spot = Spot(
-                photoUrl = "https://res.cloudinary.com/manawa/image/private/f_auto,c_limit,w_3840,q_auto/aykvlohikeutpdcp720o",
-                name = "Cowabunga",
-                location = "Biscarosse, France",
-                difficulty = 3,
-                surfBreak = "Reef Break",
-                seasonBegins = "03 Jul",
-                seasonEnds = "30 Oct"
-            )
             SpotDetailsCard(spot)
 
             val context = LocalContext.current
@@ -108,7 +108,7 @@ fun SpotDetails() {
     }
 }
 
-
+@Parcelize
 data class Spot(
     val photoUrl: String,
     val name: String,
@@ -117,7 +117,7 @@ data class Spot(
     val surfBreak: String,
     val seasonBegins: String,
     val seasonEnds: String,
-)
+) : Parcelable
 
 @Composable
 fun BrandTitle() {
@@ -147,11 +147,12 @@ fun BrandTitle() {
     }
 }
 
+
 @Composable
 fun SpotDetailsCard(spot: Spot) {
     Card(
         modifier = Modifier
-            .padding(horizontal = 40.dp)
+            .padding(horizontal = 24.dp)
             .fillMaxWidth(),
         colors = CardDefaults.cardColors(
             containerColor = WhiteFoam
@@ -191,7 +192,7 @@ fun SpotDetailsCard(spot: Spot) {
                 fontSize = 16.sp,
                 fontStyle = FontStyle.Italic,
                 fontFamily = quicksand,
-                color = DeepBlue // bleu marine leger
+                color = DeepBlue
             )
 
             Spacer(modifier = Modifier.height(48.dp))
@@ -208,7 +209,7 @@ fun SpotDetailsCard(spot: Spot) {
                     fontFamily = quicksand
                 )
                 Text(
-                    text = "${spot.difficulty}",
+                    text = "${spot.difficulty}/5",
                     fontSize = 16.sp,
                     color = DeepBlue,
                     fontFamily = quicksand
@@ -253,7 +254,7 @@ fun SpotDetailsCard(spot: Spot) {
                 )
 
                 Row(
-                    modifier = Modifier.width(170.dp),
+                    modifier = Modifier.width(184.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
@@ -264,7 +265,7 @@ fun SpotDetailsCard(spot: Spot) {
                         Text(
                             modifier = Modifier
                                 .padding(12.dp),
-                            text = spot.seasonBegins,
+                            text = formatDate(spot.seasonBegins),
                             fontSize = 16.sp,
                             fontWeight = FontWeight.SemiBold,
                             color = WhiteFoam,
@@ -281,11 +282,10 @@ fun SpotDetailsCard(spot: Spot) {
                         shape = RoundedCornerShape(12.dp),
                         color = LagoonBlue
                     ) {
-
                         Text(
                             modifier = Modifier
                                 .padding(12.dp),
-                            text = spot.seasonEnds,
+                            text = formatDate(spot.seasonEnds),
                             fontSize = 16.sp,
                             fontWeight = FontWeight.SemiBold,
                             color = WhiteFoam,
@@ -294,10 +294,18 @@ fun SpotDetailsCard(spot: Spot) {
                     }
                 }
             }
-
             Spacer(modifier = Modifier.height(24.dp))
-
-
         }
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+fun formatDate(dateString: String): String {
+    return try {
+        val parser = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.ENGLISH)
+        val formatter = DateTimeFormatter.ofPattern("dd MMM", Locale.ENGLISH)
+        LocalDate.parse(dateString, parser).format(formatter)
+    } catch (e: Exception) {
+        dateString
     }
 }
