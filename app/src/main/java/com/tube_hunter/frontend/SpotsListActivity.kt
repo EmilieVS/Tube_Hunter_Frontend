@@ -78,16 +78,20 @@ fun SpotsList() {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            BrandTitle()
-
             val context = LocalContext.current
             val spots = parseSpots(context)
 
+            BrandTitle()
+
+            Spacer(modifier = Modifier.weight(1f))
+
             ShowCards(spots)
+
+            Spacer(modifier = Modifier.weight(1f))
 
             Button(
                 onClick = {
-                    val intent = Intent(context, SpotDetailsActivity::class.java)
+                    val intent = Intent(context, AddSpotActivity::class.java)
                     context.startActivity(intent)
                 },
                 colors = ButtonDefaults.buttonColors(WhiteFoam, Color.Black),

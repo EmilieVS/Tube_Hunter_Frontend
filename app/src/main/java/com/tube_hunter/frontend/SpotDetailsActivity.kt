@@ -46,7 +46,6 @@ import com.tube_hunter.frontend.ui.theme.chewy
 import com.tube_hunter.frontend.ui.theme.quicksand
 import android.os.Parcelable
 import androidx.annotation.RequiresApi
-import androidx.compose.ui.tooling.preview.Preview
 import kotlinx.parcelize.Parcelize
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -86,7 +85,11 @@ fun SpotDetails(spot: Spot) {
         ) {
             BrandTitle()
 
+            Spacer(modifier = Modifier.weight(1f))
+
             SpotDetailsCard(spot)
+
+            Spacer(modifier = Modifier.weight(1f))
 
             val context = LocalContext.current
             Button(

@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -102,7 +103,13 @@ fun Background() {
             verticalArrangement = Arrangement.SpaceBetween
         ) {
             BrandTitle()
+
+            Spacer(modifier = Modifier.weight(1f))
+
             AddSpotCard()
+
+            Spacer(modifier = Modifier.weight(1f))
+
             val context = LocalContext.current
             Row {
                 Button(
@@ -254,7 +261,7 @@ fun AddSpotCard() {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Absolute.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
                     text = "SEASON",
@@ -433,13 +440,13 @@ fun SeasonDatePicker() {
             shape = RoundedCornerShape(12.dp),
             color = LagoonBlue,
             modifier = Modifier
-                .width(72.dp) // pour garder le style des boutons: /!\ Rendre responsive !
+                .defaultMinSize(72.dp)
                 .clickable { startDatePicker = true }
         ) {
             Text(
                 modifier = Modifier.padding(12.dp),
                 textAlign = TextAlign.Center,
-                text = startDate?.let { convertMillisToDate(it) } ?: "start",
+                text = startDate?.let { formatDateFromMillis(it) } ?: "Start",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = WhiteFoam,
@@ -458,13 +465,13 @@ fun SeasonDatePicker() {
             shape = RoundedCornerShape(12.dp),
             color = LagoonBlue,
             modifier = Modifier
-                .width(72.dp)
+                .defaultMinSize(72.dp)
                 .clickable { endDatePicker = true }
         ) {
             Text(
                 modifier = Modifier.padding(12.dp),
                 textAlign = TextAlign.Center,
-                text = endDate?.let { convertMillisToDate(it) } ?: "end",
+                text = endDate?.let { formatDateFromMillis(it) } ?: "End",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = WhiteFoam,
@@ -495,12 +502,11 @@ fun SeasonDatePicker() {
     }
 }
 
-
-
 @Composable
-fun convertMillisToDate(millis: Long): String {
-    val formatter = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault())
-    return formatter.format(Date(millis))
+fun formatDateFromMillis(millis: Long): String {
+        val date = Date(millis)
+        val formatter = SimpleDateFormat("dd MMM", Locale.getDefault())
+        return formatter.format(date)
 }
 
 
