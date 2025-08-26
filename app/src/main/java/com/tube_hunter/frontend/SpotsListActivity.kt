@@ -26,6 +26,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -168,33 +169,11 @@ fun SpotCard(spot: Spot) {
 
                 )
                 Row {
-                    DifficultyFilledImage()
-                    DifficultyFilledImage()
-                    DifficultyFilledImage()
-                    DifficultyFilledImage()
-                    DifficultyImage()
+                    IconDifficulty(spot.difficulty)
                 }
             }
         }
     }
-}
-
-@Composable
-fun DifficultyImage() {
-    Image(
-        painter = painterResource(id = R.drawable.person_simple_snowboard_bold),
-        contentDescription = null,
-        modifier = Modifier.size(width = 18.dp, height = 18.dp)
-    )
-}
-
-@Composable
-fun DifficultyFilledImage() {
-    Image(
-        painter = painterResource(id = R.drawable.person_simple_snowboard_fill),
-        contentDescription = null,
-        modifier = Modifier.size(width = 18.dp, height = 18.dp)
-    )
 }
 
 @Composable
@@ -233,6 +212,29 @@ fun parseSpots(context: Context): List<Spot> {
             seasonBegins = f.peakSurfSeasonBegins,
             seasonEnds = f.peakSurfSeasonEnds
         )
+    }
+}
+
+@Composable
+fun IconDifficulty(rating: Int) {
+    Row {
+        repeat(rating) {
+            Icon(
+                painter = painterResource(id = R.drawable.skull_fill),
+                contentDescription = null,
+                modifier = Modifier.size(18.dp),
+                tint = Color(0xFF07373D)
+            )
+        }
+
+        repeat(5 - rating) {
+            Icon(
+                painter = painterResource(id = R.drawable.skull_bold),
+                contentDescription = null,
+                modifier = Modifier.size(18.dp),
+                tint = Color(0xFF07373D)
+            )
+        }
     }
 }
 
