@@ -222,7 +222,8 @@ fun IconDifficulty(rating: Int) {
             Icon(
                 painter = painterResource(id = R.drawable.skull_fill),
                 contentDescription = null,
-                modifier = Modifier.size(18.dp)
+                modifier = Modifier.size(18.dp),
+                tint = Color(0xFF07373D)
             )
         }
 
@@ -230,7 +231,8 @@ fun IconDifficulty(rating: Int) {
             Icon(
                 painter = painterResource(id = R.drawable.skull_bold),
                 contentDescription = null,
-                modifier = Modifier.size(18.dp)
+                modifier = Modifier.size(18.dp),
+                tint = Color(0xFF07373D)
             )
         }
     }
