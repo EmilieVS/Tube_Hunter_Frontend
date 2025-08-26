@@ -30,6 +30,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerColors
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -43,6 +44,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -266,18 +268,29 @@ fun DatePickerModal(
                 onDateSelected(datePickerState.selectedDateMillis)
                 onDismiss()
             }) {
-                Text("OK")
+                Text("OK", color = DeepBlue)
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text("Cancel", color = DeepBlue)
             }
         }
     ) {
-        DatePicker(state = datePickerState)
+        MaterialTheme(
+            colorScheme = lightColorScheme(
+                primary = LagoonBlue,     // day selected
+                onPrimary = WhiteFoam,  // text selected
+                surface = WhiteFoam,    // background modal
+                onSurface = DeepBlue, // text modal
+                onSurfaceVariant = DeepBlue
+            )
+        ) {
+            DatePicker(state = datePickerState)
+        }
     }
 }
+
 
 
 @Composable
