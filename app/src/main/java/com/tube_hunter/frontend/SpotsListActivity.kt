@@ -171,6 +171,9 @@ fun FilterDialog(
     var selectedSurfBreak by remember { mutableStateOf<String?>(null) }
 
     AlertDialog(
+        containerColor = WhiteFoam,
+        textContentColor = DeepBlue,
+        titleContentColor = DeepBlue,
         onDismissRequest = onDismiss,
         title = { Text("Filter Spots") },
         text = {
