@@ -26,6 +26,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -168,7 +169,7 @@ fun SpotCard(spot: Spot) {
 
                 )
                 Row {
-                    IconDifficulty(2)
+                    IconDifficulty(spot.difficulty)
                 }
             }
         }
@@ -211,6 +212,27 @@ fun parseSpots(context: Context): List<Spot> {
             seasonBegins = f.peakSurfSeasonBegins,
             seasonEnds = f.peakSurfSeasonEnds
         )
+    }
+}
+
+@Composable
+fun IconDifficulty(rating: Int) {
+    Row {
+        repeat(rating) {
+            Icon(
+                painter = painterResource(id = R.drawable.skull_fill),
+                contentDescription = null,
+                modifier = Modifier.size(18.dp)
+            )
+        }
+
+        repeat(5 - rating) {
+            Icon(
+                painter = painterResource(id = R.drawable.skull_bold),
+                contentDescription = null,
+                modifier = Modifier.size(18.dp)
+            )
+        }
     }
 }
 
