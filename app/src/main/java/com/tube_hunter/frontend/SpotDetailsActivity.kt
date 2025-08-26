@@ -203,7 +203,8 @@ fun SpotDetailsCard(spot: Spot) {
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
                     text = "DIFFICULTY",
@@ -212,12 +213,7 @@ fun SpotDetailsCard(spot: Spot) {
                     fontWeight = FontWeight.Bold,
                     fontFamily = quicksand
                 )
-                Text(
-                    text = "${spot.difficulty}/5",
-                    fontSize = 16.sp,
-                    color = DeepBlue,
-                    fontFamily = quicksand
-                )
+                IconDifficulty(spot.difficulty)
             }
 
             Spacer(modifier = Modifier.height(24.dp))

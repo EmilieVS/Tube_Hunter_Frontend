@@ -13,21 +13,31 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -44,6 +54,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.tube_hunter.frontend.model.Welcome
 import com.tube_hunter.frontend.ui.theme.DeepBlue
+import com.tube_hunter.frontend.ui.theme.LagoonBlue
 import com.tube_hunter.frontend.ui.theme.WhiteFoam
 import com.tube_hunter.frontend.ui.theme.quicksand
 import kotlinx.serialization.json.Json
@@ -53,14 +64,19 @@ class SpotsListActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-                SpotsList()
-            }
+            SpotsList()
         }
     }
+}
 
 @Preview
 @Composable
 fun SpotsList() {
+    val context = LocalContext.current
+    val allSpots = parseSpots(context)
+
+    var showFilterDialog by remember { mutableStateOf(false) }
+    var filteredSpots by remember { mutableStateOf(allSpots) }
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -78,35 +94,145 @@ fun SpotsList() {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            val context = LocalContext.current
-            val spots = parseSpots(context)
-
             BrandTitle()
 
             Spacer(modifier = Modifier.weight(1f))
 
-            ShowCards(spots)
+            // Affiche la liste filtrée
+            ShowCards(filteredSpots)
 
             Spacer(modifier = Modifier.weight(1f))
 
-            Button(
-                onClick = {
-                    val intent = Intent(context, AddSpotActivity::class.java)
-                    context.startActivity(intent)
-                },
-                colors = ButtonDefaults.buttonColors(WhiteFoam, Color.Black),
-                modifier = Modifier.padding(bottom = 48.dp),
-            ) {
-                Text(
-                    "Add spot",
-                    fontFamily = quicksand,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold
-                )
+            Row {
+                Button(
+                    onClick = { showFilterDialog = true },
+                    colors = ButtonDefaults.buttonColors(WhiteFoam, DeepBlue),
+                    modifier = Modifier
+                        .padding(bottom = 48.dp)
+                        .defaultMinSize(120.dp)
+                ) {
+                    Text(
+                        text = "Filters",
+                        fontFamily = quicksand,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
+                if (showFilterDialog) {
+                    FilterDialog(
+                        onDismiss = { showFilterDialog = false },
+                        onConfirm = { difficulty, surfBreak ->
+                            filteredSpots = allSpots.filter { spot ->
+                                val difficultyMatch = difficulty == null || spot.difficulty == difficulty
+                                val surfBreakMatch = surfBreak == null || spot.surfBreak.contains(surfBreak)
+                                difficultyMatch && surfBreakMatch
+                            }
+                            showFilterDialog = false
+                        },
+                        onClear = {
+                            filteredSpots = allSpots
+                            showFilterDialog = false
+                        }
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(16.dp))
+
+                Button(
+                    onClick = {
+                        val intent = Intent(context, AddSpotActivity::class.java)
+                        context.startActivity(intent)
+                    },
+                    colors = ButtonDefaults.buttonColors(WhiteFoam, DeepBlue),
+                    modifier = Modifier
+                        .padding(bottom = 48.dp)
+                        .defaultMinSize(120.dp)
+                ) {
+                    Text(
+                        text = "Add spot",
+                        fontFamily = quicksand,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
             }
         }
     }
 }
+
+@Composable
+fun FilterDialog(
+    onDismiss: () -> Unit,
+    onConfirm: (Int?, String?) -> Unit,
+    onClear: () -> Unit
+) {
+    var selectedDifficulty by remember { mutableStateOf<Int?>(null) }
+    var selectedSurfBreak by remember { mutableStateOf<String?>(null) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Filter Spots") },
+        text = {
+            Column {
+                Text("Difficulty")
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    (1..5).forEach { level ->
+                        FilterChip(
+                            selected = selectedDifficulty == level,
+                            onClick = { selectedDifficulty = level },
+                            label = { Text(level.toString()) },
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = LagoonBlue,
+                                selectedLabelColor = WhiteFoam
+                            )
+                        )
+                    }
+                }
+
+                Spacer(Modifier.height(16.dp))
+
+                Text("Surf Break")
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    listOf("Point", "Beach", "Reef").forEach { type ->
+                        FilterChip(
+                            selected = selectedSurfBreak == type,
+                            onClick = { selectedSurfBreak = type },
+                            label = { Text(type) },
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = LagoonBlue,
+                                selectedLabelColor = WhiteFoam
+                            )
+                        )
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = { onConfirm(selectedDifficulty, selectedSurfBreak)
+                },
+                colors = ButtonDefaults.buttonColors(LagoonBlue, WhiteFoam)
+                ) {
+                Text("Confirm")
+            }
+        },
+        dismissButton = {
+            Button(
+                onClick = {
+                selectedDifficulty = null
+                selectedSurfBreak = null
+                onClear()
+            },
+                colors = ButtonDefaults.buttonColors(LagoonBlue, WhiteFoam)
+            ) {
+                Text("Clear")
+            }
+        }
+    )
+}
+
+
 
 @Composable
 fun SpotCard(spot: Spot) {
@@ -119,7 +245,7 @@ fun SpotCard(spot: Spot) {
                 val intent = Intent(context, SpotDetailsActivity::class.java)
                 intent.putExtra("spot", spot)
                 context.startActivity(intent)
-    },
+            },
         colors = CardDefaults.cardColors(
             containerColor = WhiteFoam,
         ),
@@ -168,33 +294,11 @@ fun SpotCard(spot: Spot) {
 
                 )
                 Row {
-                    DifficultyFilledImage()
-                    DifficultyFilledImage()
-                    DifficultyFilledImage()
-                    DifficultyFilledImage()
-                    DifficultyImage()
+                    IconDifficulty(spot.difficulty)
                 }
             }
         }
     }
-}
-
-@Composable
-fun DifficultyImage() {
-    Image(
-        painter = painterResource(id = R.drawable.person_simple_snowboard_bold),
-        contentDescription = null,
-        modifier = Modifier.size(width = 18.dp, height = 18.dp)
-    )
-}
-
-@Composable
-fun DifficultyFilledImage() {
-    Image(
-        painter = painterResource(id = R.drawable.person_simple_snowboard_fill),
-        contentDescription = null,
-        modifier = Modifier.size(width = 18.dp, height = 18.dp)
-    )
 }
 
 @Composable
@@ -233,6 +337,29 @@ fun parseSpots(context: Context): List<Spot> {
             seasonBegins = f.peakSurfSeasonBegins,
             seasonEnds = f.peakSurfSeasonEnds
         )
+    }
+}
+
+@Composable
+fun IconDifficulty(rating: Int) {
+    Row {
+        repeat(rating) {
+            Icon(
+                painter = painterResource(id = R.drawable.skull_fill),
+                contentDescription = null,
+                modifier = Modifier.size(18.dp),
+                tint = Color(0xFF07373D)
+            )
+        }
+
+        repeat(5 - rating) {
+            Icon(
+                painter = painterResource(id = R.drawable.skull_bold),
+                contentDescription = null,
+                modifier = Modifier.size(18.dp),
+                tint = Color(0xFF07373D)
+            )
+        }
     }
 }
 
