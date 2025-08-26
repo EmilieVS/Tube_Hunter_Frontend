@@ -42,6 +42,7 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -51,6 +52,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -377,14 +379,10 @@ fun AddSpotCard(
                 .fillMaxWidth(),
             horizontalAlignment = Alignment.Start
         ) {
-//
+
             AddImage(
                 imageUri = formState.imageUri,
-                onClick = { }
             )
-
-
-
 
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -500,18 +498,22 @@ fun AddSpotCard(
     }
 }
 
+
+
 @Composable
 fun AddImage(
-    imageUri: Uri?,
-    onClick: () -> Unit
+    imageUri: Uri?
 ) {
+    var userInput by remember { mutableStateOf(false) }
+    var inputText by remember { mutableStateOf("") }
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .height(180.dp)
             .clip(RoundedCornerShape(12.dp))
             .background(LagoonBlue)
-            .clickable { onClick() },
+            .clickable { userInput = true },
         contentAlignment = Alignment.Center
     ) {
         if (imageUri != null) {
@@ -522,27 +524,41 @@ fun AddImage(
                 contentScale = ContentScale.Crop
             )
         } else {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Icon(
-                    imageVector = Icons.Default.PhotoCamera,
-                    contentDescription = "Add Image",
-                    tint = WhiteFoam,
-                    modifier = Modifier.size(48.dp)
-                )
-                Text(
-                    text = "Add image",
-                    color = WhiteFoam,
-                    fontFamily = quicksand,
-                    fontSize = 16.sp
-                )
+            if (userInput) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    TextField(
+                        value = inputText,
+                        onValueChange = { inputText = it },
+                        placeholder = { Text("Tape ton texte ici") },
+                        modifier = Modifier
+                            .fillMaxWidth(0.8f)
+                            .background(Color.White, RoundedCornerShape(8.dp))
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Button(onClick = { userInput = false }) {
+                        Text("Valider")
+                    }
+                }
+            } else {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Icon(
+                        imageVector = Icons.Default.PhotoCamera,
+                        contentDescription = "Add Image",
+                        tint = WhiteFoam,
+                        modifier = Modifier.size(48.dp)
+                    )
+                    Text(
+                        text = if (inputText.isNotBlank()) inputText else "Add image",
+                        color = WhiteFoam,
+                        fontFamily = quicksand,
+                        fontSize = 16.sp,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(top = 8.dp)
+                    )
+                }
             }
         }
     }
-}
-
-@Composable
-fun AddUrl (URL : String) {
-
 }
 
 fun formatDateFromMillis(millis: Long): String {
