@@ -30,6 +30,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -52,6 +53,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.tube_hunter.frontend.model.Welcome
 import com.tube_hunter.frontend.ui.theme.DeepBlue
+import com.tube_hunter.frontend.ui.theme.LagoonBlue
 import com.tube_hunter.frontend.ui.theme.WhiteFoam
 import com.tube_hunter.frontend.ui.theme.quicksand
 import kotlinx.serialization.json.Json
@@ -178,7 +180,11 @@ fun FilterDialog(
                         FilterChip(
                             selected = selectedDifficulty == level,
                             onClick = { selectedDifficulty = level },
-                            label = { Text(level.toString()) }
+                            label = { Text(level.toString()) },
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = LagoonBlue,
+                                selectedLabelColor = WhiteFoam
+                            )
                         )
                     }
                 }
@@ -191,23 +197,34 @@ fun FilterDialog(
                         FilterChip(
                             selected = selectedSurfBreak == type,
                             onClick = { selectedSurfBreak = type },
-                            label = { Text(type) }
+                            label = { Text(type) },
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = LagoonBlue,
+                                selectedLabelColor = WhiteFoam
+                            )
                         )
                     }
                 }
             }
         },
         confirmButton = {
-            Button(onClick = { onConfirm(selectedDifficulty, selectedSurfBreak) }) {
+            Button(
+                onClick = { onConfirm(selectedDifficulty, selectedSurfBreak)
+                },
+                colors = ButtonDefaults.buttonColors(LagoonBlue, WhiteFoam)
+                ) {
                 Text("Confirm")
             }
         },
         dismissButton = {
-            Button(onClick = {
+            Button(
+                onClick = {
                 selectedDifficulty = null
                 selectedSurfBreak = null
                 onClear()
-            }) {
+            },
+                colors = ButtonDefaults.buttonColors(LagoonBlue, WhiteFoam)
+            ) {
                 Text("Clear")
             }
         }
