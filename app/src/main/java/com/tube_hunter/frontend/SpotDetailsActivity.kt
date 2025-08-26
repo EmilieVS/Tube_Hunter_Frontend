@@ -46,6 +46,7 @@ import com.tube_hunter.frontend.ui.theme.chewy
 import com.tube_hunter.frontend.ui.theme.quicksand
 import android.os.Parcelable
 import androidx.annotation.RequiresApi
+import androidx.compose.ui.tooling.preview.Preview
 import kotlinx.parcelize.Parcelize
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
