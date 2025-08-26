@@ -24,12 +24,18 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -55,14 +61,19 @@ class SpotsListActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-                SpotsList()
-            }
+            SpotsList()
         }
     }
+}
 
 @Preview
 @Composable
 fun SpotsList() {
+    val context = LocalContext.current
+    val allSpots = parseSpots(context)
+
+    var showFilterDialog by remember { mutableStateOf(false) }
+    var filteredSpots by remember { mutableStateOf(allSpots) }
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -80,23 +91,18 @@ fun SpotsList() {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            val context = LocalContext.current
-            val spots = parseSpots(context)
-
             BrandTitle()
 
             Spacer(modifier = Modifier.weight(1f))
 
-            ShowCards(spots)
+            // Affiche la liste filtrée
+            ShowCards(filteredSpots)
 
             Spacer(modifier = Modifier.weight(1f))
 
             Row {
                 Button(
-                    onClick = {
-                        val intent = Intent(context, SpotsListActivity::class.java)
-                        context.startActivity(intent)
-                    },
+                    onClick = { showFilterDialog = true },
                     colors = ButtonDefaults.buttonColors(WhiteFoam, DeepBlue),
                     modifier = Modifier
                         .padding(bottom = 48.dp)
@@ -107,6 +113,24 @@ fun SpotsList() {
                         fontFamily = quicksand,
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold
+                    )
+                }
+
+                if (showFilterDialog) {
+                    FilterDialog(
+                        onDismiss = { showFilterDialog = false },
+                        onConfirm = { difficulty, surfBreak ->
+                            filteredSpots = allSpots.filter { spot ->
+                                val difficultyMatch = difficulty == null || spot.difficulty == difficulty
+                                val surfBreakMatch = surfBreak == null || spot.surfBreak.contains(surfBreak)
+                                difficultyMatch && surfBreakMatch
+                            }
+                            showFilterDialog = false
+                        },
+                        onClear = {
+                            filteredSpots = allSpots
+                            showFilterDialog = false
+                        }
                     )
                 }
 
@@ -135,6 +159,64 @@ fun SpotsList() {
 }
 
 @Composable
+fun FilterDialog(
+    onDismiss: () -> Unit,
+    onConfirm: (Int?, String?) -> Unit,
+    onClear: () -> Unit
+) {
+    var selectedDifficulty by remember { mutableStateOf<Int?>(null) }
+    var selectedSurfBreak by remember { mutableStateOf<String?>(null) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Filter Spots") },
+        text = {
+            Column {
+                Text("Difficulty")
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    (1..5).forEach { level ->
+                        FilterChip(
+                            selected = selectedDifficulty == level,
+                            onClick = { selectedDifficulty = level },
+                            label = { Text(level.toString()) }
+                        )
+                    }
+                }
+
+                Spacer(Modifier.height(16.dp))
+
+                Text("Surf Break")
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    listOf("Point", "Beach", "Reef").forEach { type ->
+                        FilterChip(
+                            selected = selectedSurfBreak == type,
+                            onClick = { selectedSurfBreak = type },
+                            label = { Text(type) }
+                        )
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            Button(onClick = { onConfirm(selectedDifficulty, selectedSurfBreak) }) {
+                Text("Confirm")
+            }
+        },
+        dismissButton = {
+            Button(onClick = {
+                selectedDifficulty = null
+                selectedSurfBreak = null
+                onClear()
+            }) {
+                Text("Clear")
+            }
+        }
+    )
+}
+
+
+
+@Composable
 fun SpotCard(spot: Spot) {
     val context = LocalContext.current
     Card(
@@ -145,7 +227,7 @@ fun SpotCard(spot: Spot) {
                 val intent = Intent(context, SpotDetailsActivity::class.java)
                 intent.putExtra("spot", spot)
                 context.startActivity(intent)
-    },
+            },
         colors = CardDefaults.cardColors(
             containerColor = WhiteFoam,
         ),
