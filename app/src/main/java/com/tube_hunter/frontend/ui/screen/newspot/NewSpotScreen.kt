@@ -175,8 +175,15 @@ fun NewSpotCard(
             OutlinedTextField(
                 value = formState.spotName,
                 onValueChange = { onFormChange(formState.copy(spotName = it)) },
-                label = { Text("Spot Name", color = WhiteFoam, fontSize = 16.sp) },
+                placeholder = {
+                    Text(
+                        "Spot Name",
+                        color = WhiteFoam,
+                        fontSize = 16.sp,
+                    )
+                },
                 modifier = Modifier.fillMaxWidth(),
+
                 shape = RoundedCornerShape(12.dp),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = DeepBlue,
@@ -196,7 +203,13 @@ fun NewSpotCard(
             OutlinedTextField(
                 value = formState.location,
                 onValueChange = { onFormChange(formState.copy(location = it)) },
-                label = { Text("Location", color = WhiteFoam, fontSize = 16.sp) },
+                placeholder = {
+                    Text(
+                        "Location",
+                        color = WhiteFoam,
+                        fontSize = 16.sp
+                    )
+                },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 colors = OutlinedTextFieldDefaults.colors(
