@@ -1,11 +1,6 @@
-package com.tube_hunter.frontend
+package com.tube_hunter.frontend.ui.screen.spotlist
 
 import android.content.Context
-import android.content.Intent
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -48,30 +43,22 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import com.tube_hunter.frontend.model.Welcome
+import com.tube_hunter.frontend.R
+import com.tube_hunter.frontend.data.model.Welcome
+import com.tube_hunter.frontend.ui.component.BrandTitle
+import com.tube_hunter.frontend.ui.component.SpotDetailsUi
+import com.tube_hunter.frontend.ui.navigation.Screen
 import com.tube_hunter.frontend.ui.theme.DeepBlue
 import com.tube_hunter.frontend.ui.theme.LagoonBlue
 import com.tube_hunter.frontend.ui.theme.WhiteFoam
 import com.tube_hunter.frontend.ui.theme.quicksand
 import kotlinx.serialization.json.Json
 
-class SpotsListActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContent {
-            SpotsList()
-        }
-    }
-}
-
-@Preview
 @Composable
-fun SpotsList() {
+fun SpotListScreen(onNavigate: (String) -> Unit) {
     val context = LocalContext.current
     val allSpots = parseSpots(context)
 
@@ -98,8 +85,7 @@ fun SpotsList() {
 
             Spacer(modifier = Modifier.weight(1f))
 
-            // Affiche la liste filtrée
-            ShowCards(filteredSpots)
+            SpotList(filteredSpots, onNavigate)
 
             Spacer(modifier = Modifier.weight(1f))
 
@@ -124,8 +110,10 @@ fun SpotsList() {
                         onDismiss = { showFilterDialog = false },
                         onConfirm = { difficulty, surfBreak ->
                             filteredSpots = allSpots.filter { spot ->
-                                val difficultyMatch = difficulty == null || spot.difficulty == difficulty
-                                val surfBreakMatch = surfBreak == null || spot.surfBreak.contains(surfBreak)
+                                val difficultyMatch =
+                                    difficulty == null || spot.difficulty == difficulty
+                                val surfBreakMatch =
+                                    surfBreak == null || spot.surfBreak.contains(surfBreak)
                                 difficultyMatch && surfBreakMatch
                             }
                             showFilterDialog = false
@@ -141,8 +129,7 @@ fun SpotsList() {
 
                 Button(
                     onClick = {
-                        val intent = Intent(context, AddSpotActivity::class.java)
-                        context.startActivity(intent)
+                        onNavigate(Screen.NewSpot.route)
                     },
                     colors = ButtonDefaults.buttonColors(WhiteFoam, DeepBlue),
                     modifier = Modifier
@@ -155,6 +142,85 @@ fun SpotsList() {
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold
                     )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun SpotList(spots: List<SpotDetailsUi>, onNavigate: (String) -> Unit) {
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight(0.80f),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        items(spots) { spot ->
+            SpotCard(spot) {
+                onNavigate(Screen.SpotDetails.createRoute(spot.id))
+            }
+        }
+    }
+}
+
+@Composable
+fun SpotCard(spot: SpotDetailsUi, onClick: () -> Unit) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 24.dp)
+            .clickable {
+                onClick()
+            },
+        colors = CardDefaults.cardColors(
+            containerColor = WhiteFoam,
+        ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 8.dp
+        )
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            horizontalAlignment = Alignment.Start
+        ) {
+            AsyncImage(
+                model = spot.photoUrl,
+                contentDescription = spot.name,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(8.dp))
+                    .height(180.dp)
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = spot.name,
+                textAlign = TextAlign.Center,
+                fontFamily = quicksand,
+                fontWeight = FontWeight.Bold,
+                color = DeepBlue,
+                fontSize = 32.sp,
+            )
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = spot.location,
+                    fontFamily = quicksand,
+                    fontStyle = FontStyle.Italic,
+                    fontSize = 16.sp,
+                    color = DeepBlue,
+                )
+                Row {
+                    IconDifficulty(spot.difficulty)
                 }
             }
         }
@@ -213,20 +279,21 @@ fun FilterDialog(
         },
         confirmButton = {
             Button(
-                onClick = { onConfirm(selectedDifficulty, selectedSurfBreak)
+                onClick = {
+                    onConfirm(selectedDifficulty, selectedSurfBreak)
                 },
                 colors = ButtonDefaults.buttonColors(LagoonBlue, WhiteFoam)
-                ) {
+            ) {
                 Text("Confirm")
             }
         },
         dismissButton = {
             Button(
                 onClick = {
-                selectedDifficulty = null
-                selectedSurfBreak = null
-                onClear()
-            },
+                    selectedDifficulty = null
+                    selectedSurfBreak = null
+                    onClear()
+                },
                 colors = ButtonDefaults.buttonColors(LagoonBlue, WhiteFoam)
             ) {
                 Text("Clear")
@@ -235,113 +302,6 @@ fun FilterDialog(
     )
 }
 
-
-
-@Composable
-fun SpotCard(spot: Spot) {
-    val context = LocalContext.current
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 24.dp)
-            .clickable {
-                val intent = Intent(context, SpotDetailsActivity::class.java)
-                intent.putExtra("spot", spot)
-                context.startActivity(intent)
-            },
-        colors = CardDefaults.cardColors(
-            containerColor = WhiteFoam,
-        ),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 8.dp
-        )
-    ) {
-        Column (
-            modifier = Modifier.padding(16.dp),
-            horizontalAlignment = Alignment.Start
-        ) {
-            AsyncImage(
-                model = spot.photoUrl,
-                contentDescription = spot.name,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(8.dp))
-                    .height(180.dp)
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = spot.name,
-                textAlign = TextAlign.Center,
-                fontFamily = quicksand,
-                fontWeight = FontWeight.Bold,
-                color = DeepBlue,
-                fontSize = 32.sp,
-            )
-
-            Spacer(modifier = Modifier.height(4.dp))
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = spot.location,
-                    fontFamily = quicksand,
-                    fontStyle = FontStyle.Italic,
-                    fontSize = 16.sp,
-                    color = DeepBlue,
-
-                )
-                Row {
-                    IconDifficulty(spot.difficulty)
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun ShowCards(spots: List<Spot>) {
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(0.80f),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            items(spots) { spot ->
-                SpotCard(spot)
-            }
-        }
-}
-
-fun readJsonFromRaw(context: Context, rawResId: Int): String {
-    val inputStream = context.resources.openRawResource(rawResId)
-    return inputStream.bufferedReader().use { it.readText() }
-}
-
-fun parseSpots(context: Context): List<Spot> {
-    val jsonString = readJsonFromRaw(context, R.raw.spots)
-
-    val response = Json { ignoreUnknownKeys = true }
-        .decodeFromString<Welcome>(jsonString)
-
-    return response.records.map { rec ->
-        val f = rec.fields
-        Spot(
-            photoUrl = f.photos.firstOrNull()?.url ?: "",
-            name = f.destination,
-            location = f.destinationStateCountry,
-            difficulty = f.difficultyLevel.toInt(),
-            surfBreak = f.surfBreak.firstOrNull() ?: "",
-            seasonBegins = f.peakSurfSeasonBegins,
-            seasonEnds = f.peakSurfSeasonEnds
-        )
-    }
-}
 
 @Composable
 fun IconDifficulty(rating: Int) {
@@ -366,4 +326,30 @@ fun IconDifficulty(rating: Int) {
     }
 }
 
+// ----------- A METTRE DANS VIEWMODEL ? -----------
 
+fun readJsonFromRaw(context: Context, rawResId: Int): String {
+    val inputStream = context.resources.openRawResource(rawResId)
+    return inputStream.bufferedReader().use { it.readText() }
+}
+
+fun parseSpots(context: Context): List<SpotDetailsUi> {
+    val jsonString = readJsonFromRaw(context, R.raw.spots)
+
+    val response = Json { ignoreUnknownKeys = true }
+        .decodeFromString<Welcome>(jsonString)
+
+    return response.records.map { rec ->
+        val f = rec.fields
+        SpotDetailsUi(
+            id = rec.id,
+            photoUrl = f.photos.firstOrNull()?.url ?: "",
+            name = f.destination,
+            location = f.destinationStateCountry,
+            difficulty = f.difficultyLevel.toInt(),
+            surfBreak = f.surfBreak.firstOrNull() ?: "",
+            seasonBegins = f.peakSurfSeasonBegins,
+            seasonEnds = f.peakSurfSeasonEnds
+        )
+    }
+}

@@ -23,21 +23,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".SpotsListActivity"
-            android:label="Spots List Page"
-            android:exported="false">
-        </activity>
-        <activity
-            android:name=".SpotDetailsActivity"
-            android:label="Spot Details Page"
-            android:exported="false">
-        </activity>
-        <activity
-            android:name=".AddSpotActivity"
-            android:label="Spot Details Page"
-            android:exported="false">
-        </activity>
     </application>
 
 </manifest>
