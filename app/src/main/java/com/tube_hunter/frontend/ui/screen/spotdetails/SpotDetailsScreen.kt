@@ -1,8 +1,5 @@
 package com.tube_hunter.frontend.ui.screen.spotdetails
 
-import android.content.Intent
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -25,18 +22,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.tube_hunter.frontend.R
+import com.tube_hunter.frontend.ui.component.BrandTitle
 import com.tube_hunter.frontend.ui.component.SpotDetailsUi
 import com.tube_hunter.frontend.ui.navigation.Screen
 import com.tube_hunter.frontend.ui.screen.spotlist.IconDifficulty
@@ -44,10 +39,7 @@ import com.tube_hunter.frontend.ui.screen.spotlist.parseSpots
 import com.tube_hunter.frontend.ui.theme.DeepBlue
 import com.tube_hunter.frontend.ui.theme.LagoonBlue
 import com.tube_hunter.frontend.ui.theme.WhiteFoam
-import com.tube_hunter.frontend.ui.theme.chewy
 import com.tube_hunter.frontend.ui.theme.quicksand
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 @Composable
@@ -78,7 +70,7 @@ fun SpotDetailsScreen(spotId: String, onNavigate: (String) -> Unit) {
             Spacer(modifier = Modifier.weight(1f))
 
             spot?.let {
-                SpotDetailsCard(it) // ← on passe le vrai objet, pas juste l'id
+                SpotDetailsCard(it)
             } ?: Text("Spot not found", color = LagoonBlue)
 
             Spacer(modifier = Modifier.weight(1f))
@@ -172,7 +164,7 @@ fun SpotDetailsCard(spot: SpotDetailsUi) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = "SURF BREAK",
+                    text = "SURF BREAKS",
                     fontSize = 16.sp,
                     color = DeepBlue,
                     fontWeight = FontWeight.Bold,
@@ -185,7 +177,6 @@ fun SpotDetailsCard(spot: SpotDetailsUi) {
                     fontFamily = quicksand
                 )
             }
-
 
             Spacer(modifier = Modifier.height(24.dp))
 
@@ -243,49 +234,18 @@ fun SpotDetailsCard(spot: SpotDetailsUi) {
                     }
                 }
             }
-            Spacer(modifier = Modifier.height(24.dp))
         }
     }
 }
 
-@Composable
-fun BrandTitle() {
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = Modifier.padding(top = 48.dp)
-    ) {
-        Text(
-            text = "TUBE HUNTER",
-            fontSize = 56.sp,
-            fontFamily = chewy,
-            color = DeepBlue,
-            style = TextStyle(
-                shadow = Shadow(
-                    color = DeepBlue,
-                    offset = Offset(0f, 0f),
-                    blurRadius = 16f
-                )
-            )
-        )
-        Text(
-            text = "TUBE HUNTER",
-            fontSize = 56.sp,
-            fontFamily = chewy,
-            color = WhiteFoam
-        )
-    }
-}
+// ----------- A METTRE DANS VIEWMODEL ? -----------
 
-
-
-// ----------- A METTRE DANS VIEWMODEL ?????? -----------
-
-@RequiresApi(Build.VERSION_CODES.O)
 fun formatDate(dateString: String): String {
     return try {
-        val parser = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.ENGLISH)
-        val formatter = DateTimeFormatter.ofPattern("dd MMM", Locale.ENGLISH)
-        LocalDate.parse(dateString, parser).format(formatter)
+        val parser = java.text.SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
+        val formatter = java.text.SimpleDateFormat("dd MMM", Locale.ENGLISH)
+        val date = parser.parse(dateString)
+        formatter.format(date!!)
     } catch (e: Exception) {
         dateString
     }

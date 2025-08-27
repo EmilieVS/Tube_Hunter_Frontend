@@ -1,4 +1,4 @@
-package com.tube_hunter.frontend.ui.screen.addspot
+package com.tube_hunter.frontend.ui.screen.newspot
 
 import android.net.Uri
 

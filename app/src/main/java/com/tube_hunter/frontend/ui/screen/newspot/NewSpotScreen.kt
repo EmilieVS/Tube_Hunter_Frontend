@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
-package com.tube_hunter.frontend.ui.screen.addspot
+package com.tube_hunter.frontend.ui.screen.newspot
 
 import com.tube_hunter.frontend.ui.navigation.Screen
 
@@ -37,12 +37,15 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -54,7 +57,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -62,7 +64,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.tube_hunter.frontend.R
-import com.tube_hunter.frontend.ui.screen.spotdetails.BrandTitle
+import com.tube_hunter.frontend.ui.component.BrandTitle
 import com.tube_hunter.frontend.ui.theme.DeepBlue
 import com.tube_hunter.frontend.ui.theme.LagoonBlue
 import com.tube_hunter.frontend.ui.theme.WhiteFoam
@@ -72,7 +74,7 @@ import java.util.Date
 import java.util.Locale
 
 @Composable
-fun AddSpotScreen(onNavigate: (String) -> Unit) {
+fun NewSpotScreen(onNavigate: (String) -> Unit) {
     var formState by remember { mutableStateOf(SpotFormState()) }
 
     Box(
@@ -92,13 +94,11 @@ fun AddSpotScreen(onNavigate: (String) -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-
             BrandTitle()
 
             Spacer(modifier = Modifier.weight(1f))
 
-
-            AddSpotCard(
+            NewSpotCard(
                 formState = formState,
                 onFormChange = { formState = it }
             )
@@ -149,26 +149,232 @@ fun AddSpotScreen(onNavigate: (String) -> Unit) {
 }
 
 @Composable
-fun Checkboxes(
-    selected: List<String>,
-    onValueChange: (List<String>) -> Unit
+fun NewSpotCard(
+    formState: SpotFormState,
+    onFormChange: (SpotFormState) -> Unit
 ) {
-    val labels = listOf("Beach", "Reef", "Point")
+    Card(
+        modifier = Modifier
+            .padding(horizontal = 24.dp)
+            .fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = WhiteFoam),
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth(),
+            horizontalAlignment = Alignment.Start
+        ) {
+            AddImage(
+                imageUri = formState.imageUri,
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            OutlinedTextField(
+                value = formState.spotName,
+                onValueChange = { onFormChange(formState.copy(spotName = it)) },
+                label = { Text("Spot Name", color = WhiteFoam, fontSize = 16.sp) },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = DeepBlue,
+                    unfocusedBorderColor = LagoonBlue,
+                    focusedLabelColor = WhiteFoam,
+                    unfocusedLabelColor = WhiteFoam,
+                    focusedContainerColor = LagoonBlue,
+                    unfocusedContainerColor = LagoonBlue,
+                    focusedTextColor = WhiteFoam,
+                    unfocusedTextColor = WhiteFoam,
+                    cursorColor = DeepBlue
+                )
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            OutlinedTextField(
+                value = formState.location,
+                onValueChange = { onFormChange(formState.copy(location = it)) },
+                label = { Text("Location", color = WhiteFoam, fontSize = 16.sp) },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = DeepBlue,
+                    unfocusedBorderColor = LagoonBlue,
+                    focusedLabelColor = WhiteFoam,
+                    unfocusedLabelColor = WhiteFoam,
+                    focusedContainerColor = LagoonBlue,
+                    unfocusedContainerColor = LagoonBlue,
+                    focusedTextColor = WhiteFoam,
+                    unfocusedTextColor = WhiteFoam,
+                    cursorColor = DeepBlue
+                )
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = "DIFFICULTY",
+                    fontSize = 16.sp,
+                    color = DeepBlue,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = quicksand
+                )
+                Surface(
+                    shape = RoundedCornerShape(12.dp),
+                    color = LagoonBlue
+                ) {
+                    DifficultyDropdown(
+                        selected = formState.difficulty,
+                        onValueChange = { onFormChange(formState.copy(difficulty = it)) }
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(
+                    text = "SURF BREAKS",
+                    fontSize = 16.sp,
+                    color = DeepBlue,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = quicksand
+                )
+                Checkboxes(
+                    selected = formState.surfBreaks,
+                    onValueChange = { onFormChange(formState.copy(surfBreaks = it)) }
+                )
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "SEASON",
+                    fontSize = 16.sp,
+                    color = DeepBlue,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = quicksand
+                )
+                SeasonDatePicker(
+                    startDate = formState.seasonStart,
+                    endDate = formState.seasonEnd,
+                    onValueChange = { start, end ->
+                        onFormChange(formState.copy(seasonStart = start, seasonEnd = end))
+                    }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun AddImage(imageUri: Uri?) {
+    var userInput by remember { mutableStateOf(false) }
+    var inputText by remember { mutableStateOf("") }
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(180.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .background(LagoonBlue)
+            .clickable { userInput = true },
+        contentAlignment = Alignment.Center
+    ) {
+        if (imageUri != null) {
+            Image(
+                painter = rememberAsyncImagePainter(imageUri),
+                contentDescription = "Selected Image",
+                modifier = Modifier.fillMaxWidth(),
+                contentScale = ContentScale.Crop
+            )
+        } else {
+            if (userInput) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    TextField(
+                        value = inputText,
+                        onValueChange = { inputText = it },
+                        placeholder = { Text("Insert your image Url") },
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = WhiteFoam,
+                            unfocusedContainerColor = WhiteFoam,
+                            focusedLabelColor = DeepBlue,
+                            unfocusedLabelColor = DeepBlue,
+                            focusedTextColor = DeepBlue,
+                            unfocusedTextColor = DeepBlue,
+                            cursorColor = DeepBlue
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth(0.8f)
+                            .background(Color.White, RoundedCornerShape(8.dp))
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Button(
+                        onClick = { userInput = false },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = WhiteFoam,
+                            contentColor = DeepBlue
+                        )
+                    ) {
+                        Text("Confirm")
+                    }
+                }
+            } else {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Icon(
+                        imageVector = Icons.Default.PhotoCamera,
+                        contentDescription = "Add Image",
+                        tint = WhiteFoam,
+                        modifier = Modifier.size(48.dp)
+                    )
+                    Text(
+                        text = if (inputText.isNotBlank()) inputText else "Add image",
+                        color = WhiteFoam,
+                        fontFamily = quicksand,
+                        fontSize = 16.sp,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(top = 8.dp)
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun Checkboxes(selected: List<String>, onValueChange: (List<String>) -> Unit) {
+    val surfBreaks = listOf("Beach", "Reef", "Point")
 
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
-        labels.forEach { label ->
-            val checked = selected.contains(label)
+        surfBreaks.forEach { surfBreak ->
+            val checked = selected.contains(surfBreak)
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Checkbox(
                     checked = checked,
                     onCheckedChange = { isChecked ->
                         val newList = if (isChecked) {
-                            selected + label
+                            selected + surfBreak
                         } else {
-                            selected - label
+                            selected - surfBreak
                         }
                         onValueChange(newList)
                     },
@@ -178,7 +384,8 @@ fun Checkboxes(
                         checkmarkColor = WhiteFoam
                     ),
                 )
-                Text(label)
+
+                Text(surfBreak)
             }
         }
     }
@@ -198,14 +405,20 @@ fun DifficultyDropdown(
             horizontalArrangement = Arrangement.End,
         ) {
             Text(selected ?: "Select", color = WhiteFoam)
+
             IconButton(onClick = { expanded = !expanded }) {
-                Icon(Icons.Default.KeyboardArrowDown, tint = WhiteFoam, contentDescription = "Difficulty")
+                Icon(
+                    Icons.Default.KeyboardArrowDown,
+                    tint = WhiteFoam,
+                    contentDescription = "Difficulty"
+                )
             }
         }
 
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
+            modifier = Modifier.background(WhiteFoam)
         ) {
             listOf("1", "2", "3", "4", "5").forEach { value ->
                 DropdownMenuItem(
@@ -224,10 +437,7 @@ fun DifficultyDropdown(
 }
 
 @Composable
-fun DatePickerModal(
-    onDateSelected: (Long?) -> Unit,
-    onDismiss: () -> Unit
-) {
+fun DatePickerModal(onDateSelected: (Long?) -> Unit, onDismiss: () -> Unit) {
     val datePickerState = rememberDatePickerState()
 
     DatePickerDialog(
@@ -237,16 +447,26 @@ fun DatePickerModal(
                 onDateSelected(datePickerState.selectedDateMillis)
                 onDismiss()
             }) {
-                Text("OK")
+                Text("OK", color = DeepBlue)
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text("Cancel", color = DeepBlue)
             }
         }
     ) {
-        DatePicker(state = datePickerState)
+        MaterialTheme(
+            colorScheme = lightColorScheme(
+                primary = LagoonBlue,     // Day selected
+                onPrimary = WhiteFoam,    // Text selected
+                surface = WhiteFoam,      // Background modal
+                onSurface = DeepBlue,     // Text modal
+                onSurfaceVariant = DeepBlue
+            )
+        ) {
+            DatePicker(state = datePickerState)
+        }
     }
 }
 
@@ -330,213 +550,10 @@ fun SeasonDatePicker(
     }
 }
 
-@Composable
-fun AddSpotCard(
-    formState: SpotFormState,
-    onFormChange: (SpotFormState) -> Unit
-) {
-    Card(
-        modifier = Modifier
-            .padding(horizontal = 24.dp)
-            .fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = WhiteFoam),
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
-    ) {
-        Column(
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth(),
-            horizontalAlignment = Alignment.Start
-        ) {
-
-            AddImage(
-                imageUri = formState.imageUri,
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-
-            OutlinedTextField(
-                value = formState.spotName,
-                onValueChange = { onFormChange(formState.copy(spotName = it)) },
-                label = { Text("Spot Name", color = WhiteFoam, fontSize = 16.sp) },
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = DeepBlue,
-                    unfocusedBorderColor = LagoonBlue,
-                    focusedLabelColor = WhiteFoam,
-                    unfocusedLabelColor = WhiteFoam,
-                    focusedContainerColor = LagoonBlue,
-                    unfocusedContainerColor = LagoonBlue,
-                    focusedTextColor = WhiteFoam,
-                    unfocusedTextColor = WhiteFoam,
-                )
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-
-            OutlinedTextField(
-                value = formState.location,
-                onValueChange = { onFormChange(formState.copy(location = it)) },
-                label = { Text("Location", color = WhiteFoam, fontSize = 16.sp) },
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = DeepBlue,
-                    unfocusedBorderColor = LagoonBlue,
-                    focusedLabelColor = WhiteFoam,
-                    unfocusedLabelColor = WhiteFoam,
-                    focusedContainerColor = LagoonBlue,
-                    unfocusedContainerColor = LagoonBlue,
-                    focusedTextColor = WhiteFoam,
-                    unfocusedTextColor = WhiteFoam,
-                )
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(
-                    text = "DIFFICULTY",
-                    fontSize = 16.sp,
-                    color = DeepBlue,
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = quicksand
-                )
-                Surface(
-                    shape = RoundedCornerShape(12.dp),
-                    color = LagoonBlue
-                ) {
-                    DifficultyDropdown(
-                        selected = formState.difficulty,
-                        onValueChange = { onFormChange(formState.copy(difficulty = it)) }
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Text(
-                    text = "SURF BREAK",
-                    fontSize = 16.sp,
-                    color = DeepBlue,
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = quicksand
-                )
-                Checkboxes(
-                    selected = formState.surfBreaks,
-                    onValueChange = { onFormChange(formState.copy(surfBreaks = it)) }
-                )
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = "SEASON",
-                    fontSize = 16.sp,
-                    color = DeepBlue,
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = quicksand
-                )
-                SeasonDatePicker(
-                    startDate = formState.seasonStart,
-                    endDate = formState.seasonEnd,
-                    onValueChange = { start, end ->
-                        onFormChange(formState.copy(seasonStart = start, seasonEnd = end))
-                    }
-                )
-            }
-        }
-    }
-}
-
-
-@Composable
-fun AddImage(
-    imageUri: Uri?
-) {
-    var userInput by remember { mutableStateOf(false) }
-    var inputText by remember { mutableStateOf("") }
-
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(180.dp)
-            .clip(RoundedCornerShape(12.dp))
-            .background(LagoonBlue)
-            .clickable { userInput = true },
-        contentAlignment = Alignment.Center
-    ) {
-        if (imageUri != null) {
-            Image(
-                painter = rememberAsyncImagePainter(imageUri),
-                contentDescription = "Selected Image",
-                modifier = Modifier.fillMaxWidth(),
-                contentScale = ContentScale.Crop
-            )
-        } else {
-            if (userInput) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    TextField(
-                        value = inputText,
-                        onValueChange = { inputText = it },
-                        placeholder = { Text("Tape ton texte ici") },
-                        modifier = Modifier
-                            .fillMaxWidth(0.8f)
-                            .background(Color.White, RoundedCornerShape(8.dp))
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Button(onClick = { userInput = false }) {
-                        Text("Valider")
-                    }
-                }
-            } else {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Icon(
-                        imageVector = Icons.Default.PhotoCamera,
-                        contentDescription = "Add Image",
-                        tint = WhiteFoam,
-                        modifier = Modifier.size(48.dp)
-                    )
-                    Text(
-                        text = if (inputText.isNotBlank()) inputText else "Add image",
-                        color = WhiteFoam,
-                        fontFamily = quicksand,
-                        fontSize = 16.sp,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(top = 8.dp)
-                    )
-                }
-            }
-        }
-    }
-}
-
-
-
-
-// ----------- A METTRE DANS VIEWMODEL ?????? -----------
+// ----------- A METTRE DANS VIEWMODEL ? -----------
 
 fun formatDateFromMillis(millis: Long): String {
     val date = Date(millis)
     val formatter = SimpleDateFormat("dd MMM", Locale.getDefault())
     return formatter.format(date)
 }
-

@@ -1,6 +1,5 @@
 package com.tube_hunter.frontend.ui.screen.home
 
-import android.R.attr.delay
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -62,13 +61,13 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
                     .clip(CircleShape)
                     .border(width = 1.dp, color = DeepBlue, shape = CircleShape)
             )
-            MainBrandTitle()
+            HomeBrandTitle()
         }
     }
 }
 
 @Composable
-fun MainBrandTitle() {
+fun HomeBrandTitle() {
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier.padding(top = 48.dp)
