@@ -127,7 +127,7 @@ fun SpotListScreen(onNavigate: (String) -> Unit) {
 
                 Button(
                     onClick = {
-
+                        onNavigate(Screen.AddSpot.route)
                     },
                     colors = ButtonDefaults.buttonColors(WhiteFoam, DeepBlue),
                     modifier = Modifier

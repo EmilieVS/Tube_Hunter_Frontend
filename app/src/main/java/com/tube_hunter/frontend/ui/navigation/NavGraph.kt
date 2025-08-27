@@ -6,6 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.tube_hunter.frontend.ui.screen.addspot.AddSpotScreen
 import com.tube_hunter.frontend.ui.screen.home.HomeScreen
 import com.tube_hunter.frontend.ui.screen.spotdetails.SpotDetailsScreen
 import com.tube_hunter.frontend.ui.screen.spotlist.SpotListScreen
@@ -46,6 +47,12 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
             SpotDetailsScreen(
                 spotId = spotId,
                 onNavigate = { route -> navController.navigate(route) })
+        }
+
+        composable(Screen.AddSpot.route) {
+            AddSpotScreen(
+                onNavigate = { route -> navController.navigate(route) }
+            )
         }
     }
 }
