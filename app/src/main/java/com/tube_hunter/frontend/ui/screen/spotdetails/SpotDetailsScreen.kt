@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.tube_hunter.frontend.R
 import com.tube_hunter.frontend.ui.component.SpotDetailsUi
+import com.tube_hunter.frontend.ui.navigation.Screen
 import com.tube_hunter.frontend.ui.screen.spotlist.IconDifficulty
 import com.tube_hunter.frontend.ui.screen.spotlist.parseSpots
 import com.tube_hunter.frontend.ui.theme.DeepBlue
@@ -50,7 +51,7 @@ import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 @Composable
-fun SpotDetailsScreen(spotId: String) {
+fun SpotDetailsScreen(spotId: String, onNavigate: (String) -> Unit) {
     val context = LocalContext.current
     val allSpots = parseSpots(context)
     val spot = allSpots.find { it.id == spotId }
@@ -84,7 +85,7 @@ fun SpotDetailsScreen(spotId: String) {
 
             Button(
                 onClick = {
-//                    onNavigateToSpotList()
+                    onNavigate(Screen.SpotList.route)
                 },
                 colors = ButtonDefaults.buttonColors(WhiteFoam, DeepBlue),
                 modifier = Modifier.padding(bottom = 48.dp)

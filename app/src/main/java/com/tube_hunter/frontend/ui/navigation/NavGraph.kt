@@ -28,26 +28,24 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
     ) {
         composable(Screen.Home.route) {
             HomeScreen(
-                onNavigateToSpotList = {
-                    navController.navigate(Screen.SpotList.route)
-                }
+                onNavigate = { route -> navController.navigate(route) }
             )
         }
 
         composable(Screen.SpotList.route) {
             SpotListScreen(
-                onNavigateToSpotDetails = { spotId ->
-                    navController.navigate(Screen.SpotDetails.createRoute(spotId))
-                }
+                onNavigate = { route -> navController.navigate(route) }
             )
         }
 
         composable(
             route = Screen.SpotDetails.route,
             arguments = listOf(navArgument("spotId") { defaultValue = "" })
-       ) { backStackEntry ->
-           val spotId = backStackEntry.arguments?.getString("spotId") ?: ""
-           SpotDetailsScreen(spotId = spotId)
+        ) { backStackEntry ->
+            val spotId = backStackEntry.arguments?.getString("spotId") ?: ""
+            SpotDetailsScreen(
+                spotId = spotId,
+                onNavigate = { route -> navController.navigate(route) })
         }
     }
 }

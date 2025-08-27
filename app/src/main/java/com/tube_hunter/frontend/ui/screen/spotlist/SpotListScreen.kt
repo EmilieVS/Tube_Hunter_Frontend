@@ -50,6 +50,7 @@ import com.tube_hunter.frontend.R
 import com.tube_hunter.frontend.data.model.Welcome
 import com.tube_hunter.frontend.ui.component.BrandTitle
 import com.tube_hunter.frontend.ui.component.SpotDetailsUi
+import com.tube_hunter.frontend.ui.navigation.Screen
 import com.tube_hunter.frontend.ui.theme.DeepBlue
 import com.tube_hunter.frontend.ui.theme.LagoonBlue
 import com.tube_hunter.frontend.ui.theme.WhiteFoam
@@ -57,7 +58,7 @@ import com.tube_hunter.frontend.ui.theme.quicksand
 import kotlinx.serialization.json.Json
 
 @Composable
-fun SpotListScreen(onNavigateToSpotDetails: (String) -> Unit) {
+fun SpotListScreen(onNavigate: (String) -> Unit) {
     val context = LocalContext.current
     val allSpots = parseSpots(context)
 
@@ -84,7 +85,7 @@ fun SpotListScreen(onNavigateToSpotDetails: (String) -> Unit) {
 
             Spacer(modifier = Modifier.weight(1f))
 
-            ShowCards(filteredSpots,onNavigateToSpotDetails)
+            ShowCards(filteredSpots, onNavigate)
 
             Spacer(modifier = Modifier.weight(1f))
 
@@ -126,8 +127,7 @@ fun SpotListScreen(onNavigateToSpotDetails: (String) -> Unit) {
 
                 Button(
                     onClick = {
-//                        val intent = Intent(context, AddSpotActivity::class.java)
-//                        context.startActivity(intent)
+
                     },
                     colors = ButtonDefaults.buttonColors(WhiteFoam, DeepBlue),
                     modifier = Modifier
@@ -221,13 +221,13 @@ fun FilterDialog(
 }
 
 @Composable
-fun SpotCard(spot: SpotDetailsUi, onNavigateToSpotDetails: (String) -> Unit) {
+fun SpotCard(spot: SpotDetailsUi, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 24.dp)
             .clickable {
-                onNavigateToSpotDetails(spot.id)
+                onClick()
             },
         colors = CardDefaults.cardColors(
             containerColor = WhiteFoam,
@@ -284,7 +284,7 @@ fun SpotCard(spot: SpotDetailsUi, onNavigateToSpotDetails: (String) -> Unit) {
 }
 
 @Composable
-fun ShowCards(spots: List<SpotDetailsUi>, onNavigateToSpotDetails: (String) -> Unit) {
+fun ShowCards(spots: List<SpotDetailsUi>, onNavigate: (String) -> Unit) {
     LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
@@ -292,7 +292,9 @@ fun ShowCards(spots: List<SpotDetailsUi>, onNavigateToSpotDetails: (String) -> U
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         items(spots) { spot ->
-            SpotCard(spot, onNavigateToSpotDetails)
+            SpotCard(spot) {
+                onNavigate(Screen.SpotDetails.createRoute(spot.id))
+            }
         }
     }
 }

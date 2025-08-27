@@ -24,16 +24,17 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tube_hunter.frontend.R
+import com.tube_hunter.frontend.ui.navigation.Screen
 import com.tube_hunter.frontend.ui.theme.DeepBlue
 import com.tube_hunter.frontend.ui.theme.WhiteFoam
 import com.tube_hunter.frontend.ui.theme.chewy
 import kotlinx.coroutines.delay
 
 @Composable
-fun HomeScreen(onNavigateToSpotList: () -> Unit) {
+fun HomeScreen(onNavigate: (String) -> Unit) {
     LaunchedEffect(Unit) {
         delay(3000)
-        onNavigateToSpotList()
+        onNavigate(Screen.SpotList.route)
     }
 
     Box(
