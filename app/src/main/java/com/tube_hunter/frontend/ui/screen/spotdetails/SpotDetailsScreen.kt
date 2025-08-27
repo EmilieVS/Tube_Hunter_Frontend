@@ -39,6 +39,7 @@ import coil.compose.AsyncImage
 import com.tube_hunter.frontend.R
 import com.tube_hunter.frontend.ui.component.SpotDetailsUi
 import com.tube_hunter.frontend.ui.screen.spotlist.IconDifficulty
+import com.tube_hunter.frontend.ui.screen.spotlist.parseSpots
 import com.tube_hunter.frontend.ui.theme.DeepBlue
 import com.tube_hunter.frontend.ui.theme.LagoonBlue
 import com.tube_hunter.frontend.ui.theme.WhiteFoam
@@ -49,7 +50,11 @@ import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 @Composable
-fun SpotDetailsScreen(spot: SpotDetailsUi, onNavigateToSpotList: () -> Unit) {
+fun SpotDetailsScreen(spotId: String) {
+    val context = LocalContext.current
+    val allSpots = parseSpots(context)
+    val spot = allSpots.find { it.id == spotId }
+
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -71,7 +76,9 @@ fun SpotDetailsScreen(spot: SpotDetailsUi, onNavigateToSpotList: () -> Unit) {
 
             Spacer(modifier = Modifier.weight(1f))
 
-            SpotDetailsCard(spot)
+            spot?.let {
+                SpotDetailsCard(it) // ← on passe le vrai objet, pas juste l'id
+            } ?: Text("Spot not found", color = LagoonBlue)
 
             Spacer(modifier = Modifier.weight(1f))
 

@@ -42,12 +42,12 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
             )
         }
 
-//        composable(
-//            route = Screen.SpotDetails.route,
-//            arguments = listOf(navArgument("spotId") { defaultValue = "" })
-//        ) { backStackEntry ->
-//            val spotId = backStackEntry.arguments?.getString("id") ?: ""
-//            SpotDetailsScreen(spotId = spotId)
-//        }
+        composable(
+            route = Screen.SpotDetails.route,
+            arguments = listOf(navArgument("spotId") { defaultValue = "" })
+       ) { backStackEntry ->
+           val spotId = backStackEntry.arguments?.getString("spotId") ?: ""
+           SpotDetailsScreen(spotId = spotId)
+        }
     }
 }
