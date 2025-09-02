@@ -29,6 +29,7 @@ import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,6 +46,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.tube_hunter.frontend.R
 import com.tube_hunter.frontend.data.model.Welcome
@@ -58,12 +60,13 @@ import com.tube_hunter.frontend.ui.theme.quicksand
 import kotlinx.serialization.json.Json
 
 @Composable
-fun SpotListScreen(onNavigate: (String) -> Unit) {
+fun SpotListScreen(onNavigate: (String) -> Unit, viewModel: SpotListViewModel = viewModel()) {
+    val spots by viewModel.spots.collectAsState()
+
     val context = LocalContext.current
-    val allSpots = parseSpots(context)
 
     var showFilterDialog by remember { mutableStateOf(false) }
-    var filteredSpots by remember { mutableStateOf(allSpots) }
+    var filteredSpots by remember { mutableStateOf(spots) }
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -109,17 +112,17 @@ fun SpotListScreen(onNavigate: (String) -> Unit) {
                     FilterDialog(
                         onDismiss = { showFilterDialog = false },
                         onConfirm = { difficulty, surfBreak ->
-                            filteredSpots = allSpots.filter { spot ->
+                            filteredSpots = spots.filter { spot ->
                                 val difficultyMatch =
                                     difficulty == null || spot.difficulty == difficulty
                                 val surfBreakMatch =
-                                    surfBreak == null || spot.surfBreak.contains(surfBreak)
+                                    surfBreak == null || spot.surfBreaks.contains(surfBreak)
                                 difficultyMatch && surfBreakMatch
                             }
                             showFilterDialog = false
                         },
                         onClear = {
-                            filteredSpots = allSpots
+                            filteredSpots = spots
                             showFilterDialog = false
                         }
                     )
@@ -213,7 +216,7 @@ fun SpotCard(spot: SpotDetailsUi, onClick: () -> Unit) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = spot.location,
+                    text = "${spot.city}, ${spot.country}",
                     fontFamily = quicksand,
                     fontStyle = FontStyle.Italic,
                     fontSize = 16.sp,
@@ -328,28 +331,28 @@ fun IconDifficulty(rating: Int) {
 
 // ----------- A METTRE DANS VIEWMODEL ? -----------
 
-fun readJsonFromRaw(context: Context, rawResId: Int): String {
-    val inputStream = context.resources.openRawResource(rawResId)
-    return inputStream.bufferedReader().use { it.readText() }
-}
-
-fun parseSpots(context: Context): List<SpotDetailsUi> {
-    val jsonString = readJsonFromRaw(context, R.raw.spots)
-
-    val response = Json { ignoreUnknownKeys = true }
-        .decodeFromString<Welcome>(jsonString)
-
-    return response.records.map { rec ->
-        val f = rec.fields
-        SpotDetailsUi(
-            id = rec.id,
-            photoUrl = f.photos.firstOrNull()?.url ?: "",
-            name = f.destination,
-            location = f.destinationStateCountry,
-            difficulty = f.difficultyLevel.toInt(),
-            surfBreak = f.surfBreak.firstOrNull() ?: "",
-            seasonBegins = f.peakSurfSeasonBegins,
-            seasonEnds = f.peakSurfSeasonEnds
-        )
-    }
-}
+//fun readJsonFromRaw(context: Context, rawResId: Int): String {
+//    val inputStream = context.resources.openRawResource(rawResId)
+//    return inputStream.bufferedReader().use { it.readText() }
+//}
+//
+//fun parseSpots(context: Context): List<SpotDetailsUi> {
+//    val jsonString = readJsonFromRaw(context, R.raw.spots)
+//
+//    val response = Json { ignoreUnknownKeys = true }
+//        .decodeFromString<Welcome>(jsonString)
+//
+//    return response.records.map { rec ->
+//        val f = rec.fields
+//        SpotDetailsUi(
+//            id = rec.id,
+//            photoUrl = f.photos.firstOrNull()?.url ?: "",
+//            name = f.destination,
+//            location = f.destinationStateCountry,
+//            difficulty = f.difficultyLevel.toInt(),
+//            surfBreak = f.surfBreak.firstOrNull() ?: "",
+//            seasonBegins = f.peakSurfSeasonBegins,
+//            seasonEnds = f.peakSurfSeasonEnds
+//        )
+//    }
+//}

@@ -19,6 +19,8 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -29,13 +31,14 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.tube_hunter.frontend.R
 import com.tube_hunter.frontend.ui.component.BrandTitle
 import com.tube_hunter.frontend.ui.component.SpotDetailsUi
 import com.tube_hunter.frontend.ui.navigation.Screen
 import com.tube_hunter.frontend.ui.screen.spotlist.IconDifficulty
-import com.tube_hunter.frontend.ui.screen.spotlist.parseSpots
+import com.tube_hunter.frontend.ui.screen.spotlist.SpotListViewModel
 import com.tube_hunter.frontend.ui.theme.DeepBlue
 import com.tube_hunter.frontend.ui.theme.LagoonBlue
 import com.tube_hunter.frontend.ui.theme.WhiteFoam
@@ -43,10 +46,9 @@ import com.tube_hunter.frontend.ui.theme.quicksand
 import java.util.Locale
 
 @Composable
-fun SpotDetailsScreen(spotId: String, onNavigate: (String) -> Unit) {
-    val context = LocalContext.current
-    val allSpots = parseSpots(context)
-    val spot = allSpots.find { it.id == spotId }
+fun SpotDetailsScreen(spotId: String, onNavigate: (String) -> Unit, viewModel: SpotListViewModel = viewModel()) {
+    val spots by viewModel.spots.collectAsState()
+    val spot = spots.find { it.id == spotId }
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -133,7 +135,7 @@ fun SpotDetailsCard(spot: SpotDetailsUi) {
             Spacer(modifier = Modifier.height(4.dp))
 
             Text(
-                text = spot.location,
+                text = "${spot.city}, ${spot.country}",
                 fontSize = 16.sp,
                 fontStyle = FontStyle.Italic,
                 fontFamily = quicksand,
@@ -171,7 +173,7 @@ fun SpotDetailsCard(spot: SpotDetailsUi) {
                     fontFamily = quicksand
                 )
                 Text(
-                    text = spot.surfBreak,
+                    text = spot.surfBreaks,
                     fontSize = 16.sp,
                     color = DeepBlue,
                     fontFamily = quicksand
@@ -205,7 +207,7 @@ fun SpotDetailsCard(spot: SpotDetailsUi) {
                         Text(
                             modifier = Modifier
                                 .padding(12.dp),
-                            text = formatDate(spot.seasonBegins),
+                            text = formatDate(spot.seasonStart),
                             fontSize = 16.sp,
                             fontWeight = FontWeight.SemiBold,
                             color = WhiteFoam,
@@ -225,7 +227,7 @@ fun SpotDetailsCard(spot: SpotDetailsUi) {
                         Text(
                             modifier = Modifier
                                 .padding(12.dp),
-                            text = formatDate(spot.seasonEnds),
+                            text = formatDate(spot.seasonEnd),
                             fontSize = 16.sp,
                             fontWeight = FontWeight.SemiBold,
                             color = WhiteFoam,
