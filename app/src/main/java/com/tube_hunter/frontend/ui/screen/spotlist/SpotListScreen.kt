@@ -29,6 +29,7 @@ import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -62,11 +63,12 @@ import kotlinx.serialization.json.Json
 @Composable
 fun SpotListScreen(onNavigate: (String) -> Unit, viewModel: SpotListViewModel = viewModel()) {
     val spots by viewModel.spots.collectAsState()
-
-    val context = LocalContext.current
-
+    var filteredSpots by remember { mutableStateOf<List<SpotDetailsUi>>(emptyList()) }
     var showFilterDialog by remember { mutableStateOf(false) }
-    var filteredSpots by remember { mutableStateOf(spots) }
+
+    LaunchedEffect(spots) {
+        filteredSpots = spots
+    }
 
     Box(
         modifier = Modifier.fillMaxSize(),
