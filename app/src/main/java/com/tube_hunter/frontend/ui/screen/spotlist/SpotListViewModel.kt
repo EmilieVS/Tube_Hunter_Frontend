@@ -38,6 +38,7 @@ class SpotListViewModel : ViewModel() {
                     )
                 }
             } catch (e: Exception) {
+                Log.e("API_RESPONSE", "Erreur lors de la requete", e )
                 e.printStackTrace()
             }
         }
