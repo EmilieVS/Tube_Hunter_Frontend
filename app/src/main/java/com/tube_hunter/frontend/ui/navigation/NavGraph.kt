@@ -6,10 +6,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.tube_hunter.frontend.ui.component.SpotDetailsUi
 import com.tube_hunter.frontend.ui.screen.newspot.NewSpotScreen
 import com.tube_hunter.frontend.ui.screen.home.HomeScreen
 import com.tube_hunter.frontend.ui.screen.spotdetails.SpotDetailsScreen
 import com.tube_hunter.frontend.ui.screen.spotlist.SpotListScreen
+import com.tube_hunter.frontend.ui.screen.spotlist.SpotListViewModel
 
 sealed class Screen(val route: String) {
     object Home : Screen("home")

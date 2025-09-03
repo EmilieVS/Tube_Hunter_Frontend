@@ -4,57 +4,35 @@ import kotlinx.serialization.*
 
 @Serializable
 data class Welcome (
-    val records: List<Record>
+    @SerialName("id")
+    val id: Long,
+
+    @SerialName("photo_url")
+    val photoUrl: String,
+
+    @SerialName("name")
+    val name: String,
+
+    @SerialName("location")
+    val location: Location,
+
+    @SerialName("difficulty")
+    val difficulty: Int,
+
+    @SerialName("surf_breaks")
+    val surfBreaks: String,
+
+    @SerialName("season_start")
+    val seasonStart: String,
+
+    @SerialName("season_end")
+    val seasonEnd: String,
 )
 
 @Serializable
-data class Record (
-    val id: String,
-    val fields: Fields,
-    val createdTime: String
-)
-
-@Serializable
-data class Fields (
-    @SerialName("Surf Break")
-    val surfBreak: List<String>,
-
-    @SerialName("Difficulty Level")
-    val difficultyLevel: Long,
-
-    @SerialName("Destination")
-    val destination: String,
-
-    @SerialName("Geocode")
-    val geocode: String,
-
-    @SerialName("Influencers")
-    val influencers: List<String>,
-
-    @SerialName("Magic Seaweed Link")
-    val magicSeaweedLink: String,
-
-    @SerialName("Photos")
-    val photos: List<Photo>,
-
-    @SerialName("Peak Surf Season Begins")
-    val peakSurfSeasonBegins: String,
-
-    @SerialName("Destination State/Country")
-    val destinationStateCountry: String,
-
-    @SerialName("Peak Surf Season Ends")
-    val peakSurfSeasonEnds: String,
-
-    @SerialName("Address")
-    val address: String
-)
-
-@Serializable
-data class Photo (
-    val id: String,
-    val url: String,
-    val filename: String,
-    val size: Long,
-    val type: String,
+data class Location (
+    val country: String,
+    val city: String,
+    val lat: Float,
+    val long: Float,
 )
