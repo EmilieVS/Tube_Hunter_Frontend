@@ -61,6 +61,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import com.tube_hunter.frontend.R
 import com.tube_hunter.frontend.ui.component.BrandTitle
@@ -170,7 +171,7 @@ fun NewSpotCard(
                 onImageChange = { onFormChange(formState.copy(imageUrl = it)) }
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             OutlinedTextField(
                 value = formState.spotName,
@@ -225,7 +226,7 @@ fun NewSpotCard(
                 )
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             OutlinedTextField(
                 value = formState.country,
@@ -327,7 +328,7 @@ fun AddImage(
     onImageChange: (String) -> Unit
 ) {
     var userInput by remember { mutableStateOf(false) }
-    var inputText by remember { mutableStateOf(imageUrl) }
+    var inputText by remember { mutableStateOf("") }
 
     Box(
         modifier = Modifier
@@ -339,10 +340,13 @@ fun AddImage(
         contentAlignment = Alignment.Center
     ) {
         if (imageUrl.isNotBlank()) {
-            Image(
-                painter = rememberAsyncImagePainter(imageUrl),
-                contentDescription = "Selected Image",
-                modifier = Modifier.fillMaxWidth(),
+            AsyncImage(
+                model = imageUrl,
+                contentDescription = "Spot image",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(8.dp))
+                    .height(180.dp),
                 contentScale = ContentScale.Crop
             )
         } else {
