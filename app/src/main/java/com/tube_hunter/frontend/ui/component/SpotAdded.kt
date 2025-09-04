@@ -4,8 +4,7 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class SpotDetailsUi(
-    val id: Long,
+data class SpotAdded(
     val photoUrl: String,
     val name: String,
     val city: String,

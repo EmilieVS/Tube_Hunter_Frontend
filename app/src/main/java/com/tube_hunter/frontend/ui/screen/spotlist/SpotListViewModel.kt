@@ -26,7 +26,7 @@ class SpotListViewModel : ViewModel() {
                 // Mapping entre Welcome (backend) et SpotDetailsUi (UI)
                 _spots.value = result.map { welcome ->
                     SpotDetailsUi(
-                        id = welcome.id.toString(),
+                        id = welcome.id,
                         photoUrl = welcome.photoUrl,
                         name = welcome.name,
                         city = welcome.city,

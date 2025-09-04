@@ -3,7 +3,6 @@
 package com.tube_hunter.frontend.ui.screen.newspot
 
 import com.tube_hunter.frontend.ui.navigation.Screen
-
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -61,10 +60,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
-import coil.compose.rememberAsyncImagePainter
 import com.tube_hunter.frontend.R
 import com.tube_hunter.frontend.ui.component.BrandTitle
+import com.tube_hunter.frontend.ui.screen.spotlist.SpotListViewModel
 import com.tube_hunter.frontend.ui.theme.DeepBlue
 import com.tube_hunter.frontend.ui.theme.LagoonBlue
 import com.tube_hunter.frontend.ui.theme.WhiteFoam
@@ -74,7 +74,7 @@ import java.util.Date
 import java.util.Locale
 
 @Composable
-fun NewSpotScreen(onNavigate: (String) -> Unit) {
+fun NewSpotScreen(onNavigate: (String) -> Unit, viewModel: NewSpotViewModel = viewModel()) {
     var formState by remember { mutableStateOf(SpotFormState()) }
 
     Box(
@@ -126,6 +126,7 @@ fun NewSpotScreen(onNavigate: (String) -> Unit) {
                 Button(
                     onClick = {
                         onNavigate(Screen.SpotList.route)
+                        viewModel.sendSpot()
                     },
                     enabled = formState.isValid(),
                     colors = ButtonDefaults.buttonColors(
