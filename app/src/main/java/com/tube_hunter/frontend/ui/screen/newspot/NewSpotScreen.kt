@@ -125,8 +125,8 @@ fun NewSpotScreen(onNavigate: (String) -> Unit, viewModel: NewSpotViewModel = vi
 
                 Button(
                     onClick = {
+                        viewModel.sendSpot(formState)
                         onNavigate(Screen.SpotList.route)
-                        viewModel.sendSpot()
                     },
                     enabled = formState.isValid(),
                     colors = ButtonDefaults.buttonColors(

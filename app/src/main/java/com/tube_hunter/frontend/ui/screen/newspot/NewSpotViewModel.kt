@@ -32,24 +32,20 @@ data class SpotFormState(
 }
 
 class NewSpotViewModel : ViewModel() {
-    private val _formSpot = MutableStateFlow(SpotFormState())
-    val formSpot: StateFlow<SpotFormState> = _formSpot
-
-    fun sendSpot() {
+    fun sendSpot(formSpot: SpotFormState) {
         viewModelScope.launch {
             try {
                 val spotRequest = SpotDetailsUi(
                     id = 0,
-                    photoUrl = formSpot.value.imageUrl,
-                    name = formSpot.value.spotName,
-                    city = formSpot.value.city,
-                    country = formSpot.value.country,
-                    difficulty = formSpot.value.difficulty,
-                    surfBreaks = formSpot.value.surfBreaks,
-                    seasonStart = formSpot.value.seasonStart?.toString() ?: "",
-                    seasonEnd = formSpot.value.seasonEnd?.toString() ?: ""
+                    photoUrl = formSpot.imageUrl,
+                    name = formSpot.spotName,
+                    city = formSpot.city,
+                    country = formSpot.country,
+                    difficulty = formSpot.difficulty,
+                    surfBreaks = formSpot.surfBreaks,
+                    seasonStart = formSpot.seasonStart?.toString() ?: "",
+                    seasonEnd = formSpot.seasonEnd?.toString() ?: ""
                 )
-                Log.d("Spot request", "spot: $spotRequest")
                 val result = ApiClient.api.addSpot(spotRequest)
                 Log.d("API_RESPONSE", "Response: $result")
 
