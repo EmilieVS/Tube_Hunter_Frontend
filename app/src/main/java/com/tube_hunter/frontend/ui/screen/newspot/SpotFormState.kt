@@ -1,21 +1,22 @@
 package com.tube_hunter.frontend.ui.screen.newspot
 
-import android.net.Uri
-
 data class SpotFormState(
+    val imageUrl: String = "",
     val spotName: String = "",
-    val location: String = "",
-    val imageUri: Uri? = null,
-    val difficulty: String? = null,
-    val surfBreaks: List<String> = emptyList(),
+    val city: String = "",
+    val country: String = "",
+    val difficulty: Int = 0,
+    val surfBreaks: String = "",
     val seasonStart: Long? = null,
-    val seasonEnd: Long? = null,
+    val seasonEnd: Long? = null
 ) {
     fun isValid(): Boolean {
-        return spotName.isNotBlank()
-                && location.isNotBlank()
-                && difficulty != null
-                && surfBreaks.isNotEmpty()
+        return imageUrl.isNotBlank()
+                && spotName.isNotBlank()
+                && city.isNotBlank()
+                && country.isNotBlank()
+                && difficulty > 0
+                && surfBreaks.isNotBlank()
                 && seasonStart != null
                 && seasonEnd != null
     }

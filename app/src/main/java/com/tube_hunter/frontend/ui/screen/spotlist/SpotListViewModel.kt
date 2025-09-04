@@ -29,8 +29,8 @@ class SpotListViewModel : ViewModel() {
                         id = welcome.id.toString(),
                         photoUrl = welcome.photoUrl,
                         name = welcome.name,
-                        country = welcome.location.country,
-                        city = welcome.location.city,
+                        city = welcome.city,
+                        country = welcome.country,
                         difficulty = welcome.difficulty,
                         surfBreaks = welcome.surfBreaks,
                         seasonStart = welcome.seasonStart,
@@ -38,7 +38,7 @@ class SpotListViewModel : ViewModel() {
                     )
                 }
             } catch (e: Exception) {
-                Log.e("API_RESPONSE", "Erreur lors de la requete", e )
+                Log.e("API_RESPONSE", "Error during request", e )
                 e.printStackTrace()
             }
         }

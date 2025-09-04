@@ -330,31 +330,3 @@ fun IconDifficulty(rating: Int) {
         }
     }
 }
-
-// ----------- A METTRE DANS VIEWMODEL ? -----------
-
-//fun readJsonFromRaw(context: Context, rawResId: Int): String {
-//    val inputStream = context.resources.openRawResource(rawResId)
-//    return inputStream.bufferedReader().use { it.readText() }
-//}
-//
-//fun parseSpots(context: Context): List<SpotDetailsUi> {
-//    val jsonString = readJsonFromRaw(context, R.raw.spots)
-//
-//    val response = Json { ignoreUnknownKeys = true }
-//        .decodeFromString<Welcome>(jsonString)
-//
-//    return response.records.map { rec ->
-//        val f = rec.fields
-//        SpotDetailsUi(
-//            id = rec.id,
-//            photoUrl = f.photos.firstOrNull()?.url ?: "",
-//            name = f.destination,
-//            location = f.destinationStateCountry,
-//            difficulty = f.difficultyLevel.toInt(),
-//            surfBreak = f.surfBreak.firstOrNull() ?: "",
-//            seasonBegins = f.peakSurfSeasonBegins,
-//            seasonEnds = f.peakSurfSeasonEnds
-//        )
-//    }
-//}

@@ -13,8 +13,11 @@ data class Welcome (
     @SerialName("name")
     val name: String,
 
-    @SerialName("location")
-    val location: Location,
+    @SerialName("city")
+    val city: String,
+
+    @SerialName("country")
+    val country: String,
 
     @SerialName("difficulty")
     val difficulty: Int,
@@ -27,12 +30,4 @@ data class Welcome (
 
     @SerialName("season_end")
     val seasonEnd: String,
-)
-
-@Serializable
-data class Location (
-    val country: String,
-    val city: String,
-    val lat: Float,
-    val long: Float,
 )

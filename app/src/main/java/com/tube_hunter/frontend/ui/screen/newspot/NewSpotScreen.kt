@@ -5,7 +5,6 @@ package com.tube_hunter.frontend.ui.screen.newspot
 import com.tube_hunter.frontend.ui.navigation.Screen
 
 import androidx.compose.material3.ExperimentalMaterial3Api
-import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -167,7 +166,8 @@ fun NewSpotCard(
             horizontalAlignment = Alignment.Start
         ) {
             AddImage(
-                imageUri = formState.imageUri,
+                imageUrl = formState.imageUrl,
+                onImageChange = { onFormChange(formState.copy(imageUrl = it)) }
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -201,11 +201,38 @@ fun NewSpotCard(
             Spacer(modifier = Modifier.height(8.dp))
 
             OutlinedTextField(
-                value = formState.location,
-                onValueChange = { onFormChange(formState.copy(location = it)) },
+                value = formState.city,
+                onValueChange = { onFormChange(formState.copy(city = it)) },
                 placeholder = {
                     Text(
-                        "Location",
+                        "City",
+                        color = WhiteFoam,
+                        fontSize = 16.sp
+                    )
+                },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = DeepBlue,
+                    unfocusedBorderColor = LagoonBlue,
+                    focusedLabelColor = WhiteFoam,
+                    unfocusedLabelColor = WhiteFoam,
+                    focusedContainerColor = LagoonBlue,
+                    unfocusedContainerColor = LagoonBlue,
+                    focusedTextColor = WhiteFoam,
+                    unfocusedTextColor = WhiteFoam,
+                    cursorColor = DeepBlue
+                )
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            OutlinedTextField(
+                value = formState.country,
+                onValueChange = { onFormChange(formState.copy(country = it)) },
+                placeholder = {
+                    Text(
+                        "Country",
                         color = WhiteFoam,
                         fontSize = 16.sp
                     )
@@ -295,9 +322,12 @@ fun NewSpotCard(
 }
 
 @Composable
-fun AddImage(imageUri: Uri?) {
+fun AddImage(
+    imageUrl: String,
+    onImageChange: (String) -> Unit
+) {
     var userInput by remember { mutableStateOf(false) }
-    var inputText by remember { mutableStateOf("") }
+    var inputText by remember { mutableStateOf(imageUrl) }
 
     Box(
         modifier = Modifier
@@ -308,9 +338,9 @@ fun AddImage(imageUri: Uri?) {
             .clickable { userInput = true },
         contentAlignment = Alignment.Center
     ) {
-        if (imageUri != null) {
+        if (imageUrl.isNotBlank()) {
             Image(
-                painter = rememberAsyncImagePainter(imageUri),
+                painter = rememberAsyncImagePainter(imageUrl),
                 contentDescription = "Selected Image",
                 modifier = Modifier.fillMaxWidth(),
                 contentScale = ContentScale.Crop
@@ -321,7 +351,7 @@ fun AddImage(imageUri: Uri?) {
                     TextField(
                         value = inputText,
                         onValueChange = { inputText = it },
-                        placeholder = { Text("Insert your image Url") },
+                        placeholder = { Text("Insert your image URL") },
                         colors = TextFieldDefaults.colors(
                             focusedContainerColor = WhiteFoam,
                             unfocusedContainerColor = WhiteFoam,
@@ -339,7 +369,10 @@ fun AddImage(imageUri: Uri?) {
                     Spacer(modifier = Modifier.height(8.dp))
 
                     Button(
-                        onClick = { userInput = false },
+                        onClick = {
+                            onImageChange(inputText.trim())
+                            userInput = false
+                        },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = WhiteFoam,
                             contentColor = DeepBlue
@@ -357,7 +390,7 @@ fun AddImage(imageUri: Uri?) {
                         modifier = Modifier.size(48.dp)
                     )
                     Text(
-                        text = if (inputText.isNotBlank()) inputText else "Add image",
+                        text = if (imageUrl.isNotBlank()) imageUrl else "Add image",
                         color = WhiteFoam,
                         fontFamily = quicksand,
                         fontSize = 16.sp,
@@ -371,7 +404,10 @@ fun AddImage(imageUri: Uri?) {
 }
 
 @Composable
-fun Checkboxes(selected: List<String>, onValueChange: (List<String>) -> Unit) {
+fun Checkboxes(
+    selected: String,
+    onValueChange: (String) -> Unit
+) {
     val surfBreaks = listOf("Beach", "Reef", "Point")
 
     Row(
@@ -379,17 +415,12 @@ fun Checkboxes(selected: List<String>, onValueChange: (List<String>) -> Unit) {
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         surfBreaks.forEach { surfBreak ->
-            val checked = selected.contains(surfBreak)
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Checkbox(
-                    checked = checked,
+                    checked = selected == surfBreak,
                     onCheckedChange = { isChecked ->
-                        val newList = if (isChecked) {
-                            selected + surfBreak
-                        } else {
-                            selected - surfBreak
-                        }
-                        onValueChange(newList)
+                        val newValue = if (isChecked) surfBreak else ""
+                        onValueChange(newValue)
                     },
                     colors = CheckboxDefaults.colors(
                         checkedColor = LagoonBlue,
@@ -404,20 +435,23 @@ fun Checkboxes(selected: List<String>, onValueChange: (List<String>) -> Unit) {
     }
 }
 
+
 @Composable
 fun DifficultyDropdown(
-    selected: String?,
-    onValueChange: (String) -> Unit
+    selected: Int,
+    onValueChange: (Int) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
-
 
     Box(modifier = Modifier.padding(start = 16.dp)) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.End,
         ) {
-            Text(selected ?: "Select", color = WhiteFoam)
+            Text(
+                text = if (selected > 0) selected.toString() else "Select",
+                color = WhiteFoam
+            )
 
             IconButton(onClick = { expanded = !expanded }) {
                 Icon(
@@ -433,9 +467,15 @@ fun DifficultyDropdown(
             onDismissRequest = { expanded = false },
             modifier = Modifier.background(WhiteFoam)
         ) {
-            listOf("1", "2", "3", "4", "5").forEach { value ->
+            (1..5).forEach { value ->
                 DropdownMenuItem(
-                    text = { Text(value, fontSize = 14.sp, modifier = Modifier.padding(4.dp)) },
+                    text = {
+                        Text(
+                            value.toString(),
+                            fontSize = 14.sp,
+                            modifier = Modifier.padding(4.dp)
+                        )
+                    },
                     onClick = {
                         onValueChange(value)
                         expanded = false
