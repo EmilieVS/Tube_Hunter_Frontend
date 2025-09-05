@@ -1,13 +1,16 @@
 package com.tube_hunter.frontend.ui.screen.newspot
 
-import android.util.Log
+import ApiError
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.gson.Gson
 import com.tube_hunter.frontend.data.api.ApiClient
 import com.tube_hunter.frontend.ui.component.SpotDetailsUi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
+import org.json.JSONObject
 
 data class SpotFormState(
     val imageUrl: String = "",
@@ -32,6 +35,13 @@ data class SpotFormState(
 }
 
 class NewSpotViewModel : ViewModel() {
+
+    private val _uiMessage = MutableStateFlow<String?>(null)
+    val uiMessage: StateFlow<String?> = _uiMessage
+
+    private val _isSuccess = MutableStateFlow(false)
+    val isSuccess: StateFlow<Boolean> = _isSuccess
+
     fun sendSpot(formSpot: SpotFormState) {
         viewModelScope.launch {
             try {
@@ -46,13 +56,25 @@ class NewSpotViewModel : ViewModel() {
                     seasonStart = formSpot.seasonStart?.toString() ?: "",
                     seasonEnd = formSpot.seasonEnd?.toString() ?: ""
                 )
-                val result = ApiClient.api.addSpot(spotRequest)
-                Log.d("API_RESPONSE", "Response: $result")
+
+                val response = ApiClient.api.addSpot(spotRequest)
+
+                val jsonString = Gson().toJson(response)
+                val json = JSONObject(jsonString)
+                _uiMessage.value = json.optString("message") //spot added successfuly
+                _isSuccess.value = true
+
+            } catch (e: retrofit2.HttpException) {
+                val errorJson = e.response()?.errorBody()?.string()
+                val parsedError = errorJson?.let { Json.decodeFromString<ApiError>(it) }
+                _uiMessage.value = parsedError?.error //spot already exists
+                _isSuccess.value = false
 
             } catch (e: Exception) {
-                Log.e("API_RESPONSE", "Error during request", e )
-                e.printStackTrace()
+                _uiMessage.value = e.message //servor error
+                _isSuccess.value = false
             }
         }
     }
 }
+
