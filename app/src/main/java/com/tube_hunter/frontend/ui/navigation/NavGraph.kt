@@ -33,9 +33,14 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
             )
         }
 
-        composable(Screen.SpotList.route) {
+        composable(
+            route = Screen.SpotList.route + "?message={message}",
+            arguments = listOf(navArgument("message") { defaultValue = "" })
+        ) { backStackEntry ->
+            val message = backStackEntry.arguments?.getString("message") ?: ""
             SpotListScreen(
-                onNavigate = { route -> navController.navigate(route) }
+                onNavigate = { route -> navController.navigate(route) },
+                snackbarMessage = message
             )
         }
 
