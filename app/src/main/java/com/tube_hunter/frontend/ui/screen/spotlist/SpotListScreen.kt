@@ -66,6 +66,9 @@ fun SpotListScreen(onNavigate: (String) -> Unit, viewModel: SpotListViewModel = 
     var filteredSpots by remember { mutableStateOf<List<SpotDetailsUi>>(emptyList()) }
     var showFilterDialog by remember { mutableStateOf(false) }
 
+    val selectedDifficulty by viewModel.selectedDifficulty.collectAsState()
+    val selectedSurfBreak by viewModel.selectedSurfBreak.collectAsState()
+
     LaunchedEffect(spots) {
         filteredSpots = spots
     }
@@ -112,6 +115,10 @@ fun SpotListScreen(onNavigate: (String) -> Unit, viewModel: SpotListViewModel = 
 
                 if (showFilterDialog) {
                     FilterDialog(
+                        selectedDifficulty = selectedDifficulty,
+                        selectedSurfBreak = selectedSurfBreak,
+                        onDifficultyChange = { viewModel.setDifficulty(it) },
+                        onSurfBreakChange = { viewModel.setSurfBreak(it) },
                         onDismiss = { showFilterDialog = false },
                         onConfirm = { difficulty, surfBreak ->
                             filteredSpots = spots.filter { spot ->
@@ -234,6 +241,10 @@ fun SpotCard(spot: SpotDetailsUi, onClick: () -> Unit) {
 
 @Composable
 fun FilterDialog(
+    selectedDifficulty: Int?,
+    selectedSurfBreak: String?,
+    onDifficultyChange: (Int?) -> Unit,
+    onSurfBreakChange: (String?) -> Unit,
     onDismiss: () -> Unit,
     onConfirm: (Int?, String?) -> Unit,
     onClear: () -> Unit
