@@ -2,22 +2,21 @@ package com.tube_hunter.frontend.ui.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.tube_hunter.frontend.ui.component.SpotDetailsUi
 import com.tube_hunter.frontend.ui.screen.newspot.NewSpotScreen
 import com.tube_hunter.frontend.ui.screen.home.HomeScreen
 import com.tube_hunter.frontend.ui.screen.spotdetails.SpotDetailsScreen
 import com.tube_hunter.frontend.ui.screen.spotlist.SpotListScreen
-import com.tube_hunter.frontend.ui.screen.spotlist.SpotListViewModel
 
 sealed class Screen(val route: String) {
     object Home : Screen("home")
     object SpotList : Screen("spot_list")
     object SpotDetails : Screen("spot_details/{spotId}") {
-        fun createRoute(spotId: String) = "spot_details/$spotId"
+        fun createRoute(spotId: Long) = "spot_details/$spotId"
     }
     object NewSpot : Screen("add_spot")
 }
@@ -42,13 +41,18 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
 
         composable(
             route = Screen.SpotDetails.route,
-            arguments = listOf(navArgument("spotId") { defaultValue = "" })
+            arguments = listOf(navArgument("spotId") {
+                type = NavType.LongType
+                defaultValue = -1L
+            })
         ) { backStackEntry ->
-            val spotId = backStackEntry.arguments?.getString("spotId") ?: ""
+            val spotId = backStackEntry.arguments?.getLong("spotId") ?: -1L
             SpotDetailsScreen(
                 spotId = spotId,
-                onNavigate = { route -> navController.navigate(route) })
+                onNavigate = { route -> navController.navigate(route) }
+            )
         }
+
 
         composable(Screen.NewSpot.route) {
             NewSpotScreen(

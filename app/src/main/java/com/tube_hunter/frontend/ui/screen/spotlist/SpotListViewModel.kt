@@ -26,11 +26,11 @@ class SpotListViewModel : ViewModel() {
                 // Mapping entre Welcome (backend) et SpotDetailsUi (UI)
                 _spots.value = result.map { welcome ->
                     SpotDetailsUi(
-                        id = welcome.id.toString(),
+                        id = welcome.id,
                         photoUrl = welcome.photoUrl,
                         name = welcome.name,
-                        country = welcome.location.country,
-                        city = welcome.location.city,
+                        city = welcome.city,
+                        country = welcome.country,
                         difficulty = welcome.difficulty,
                         surfBreaks = welcome.surfBreaks,
                         seasonStart = welcome.seasonStart,
@@ -38,7 +38,7 @@ class SpotListViewModel : ViewModel() {
                     )
                 }
             } catch (e: Exception) {
-                Log.e("API_RESPONSE", "Erreur lors de la requete", e )
+                Log.e("API_RESPONSE", "Error during request", e )
                 e.printStackTrace()
             }
         }

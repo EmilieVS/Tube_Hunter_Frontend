@@ -46,7 +46,7 @@ import com.tube_hunter.frontend.ui.theme.quicksand
 import java.util.Locale
 
 @Composable
-fun SpotDetailsScreen(spotId: String, onNavigate: (String) -> Unit, viewModel: SpotListViewModel = viewModel()) {
+fun SpotDetailsScreen(spotId: Long, onNavigate: (String) -> Unit, viewModel: SpotListViewModel = viewModel()) {
     val spots by viewModel.spots.collectAsState()
     val spot = spots.find { it.id == spotId }
 
