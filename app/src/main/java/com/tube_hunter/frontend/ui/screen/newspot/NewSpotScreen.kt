@@ -63,6 +63,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -462,7 +463,10 @@ fun Checkboxes(
                     ),
                 )
 
-                Text(surfBreak)
+                Text(
+                    surfBreak,
+                    fontSize = 16.sp
+                )
             }
         }
     }
@@ -476,49 +480,54 @@ fun DifficultyDropdown(
 ) {
     var expanded by remember { mutableStateOf(false) }
 
-    Box(modifier = Modifier.padding(start = 16.dp)) {
+    Box {
         Row(
             modifier = Modifier
                 .clickable { expanded = !expanded }
-                .padding(horizontal = 12.dp, vertical = 8.dp),
+                .padding(horizontal = 16.dp, vertical = 16.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.End,
+            horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             Text(
                 text = if (selected > 0) selected.toString() else "Select",
-                color = WhiteFoam
+                color = WhiteFoam,
+                fontSize = 16.sp
             )
 
-            IconButton(onClick = { expanded = !expanded }) {
-                Icon(
-                    Icons.Default.KeyboardArrowDown,
-                    tint = WhiteFoam,
-                    contentDescription = "Difficulty"
-                )
-            }
+            Icon(
+                Icons.Default.KeyboardArrowDown,
+                tint = WhiteFoam,
+                contentDescription = "Difficulty"
+            )
         }
 
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
-            modifier = Modifier.background(WhiteFoam)
+            modifier = Modifier.background(WhiteFoam),
+            offset =  DpOffset(x = 20.dp, y = 0.dp)
         ) {
             (1..5).forEach { value ->
                 DropdownMenuItem(
                     text = {
-                        Text(
-                            value.toString(),
-                            fontSize = 14.sp,
-                            modifier = Modifier.padding(4.dp)
-                        )
+                        Box(
+                            modifier = Modifier.fillMaxWidth(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                value.toString(),
+                                fontSize = 16.sp,
+                                modifier = Modifier.padding(4.dp),
+                            )
+                        }
                     },
                     onClick = {
                         onValueChange(value)
                         expanded = false
                     },
                     modifier = Modifier
-                        .height(32.dp)
-                        .width(60.dp)
+                        .height(30.dp)
+                        .width(56.dp)
                 )
             }
         }
