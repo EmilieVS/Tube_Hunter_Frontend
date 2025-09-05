@@ -1,3 +1,6 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -18,6 +21,8 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("String", "API_BASE_URL", "\"${getApiBaseUrl()}\"")
     }
 
     buildTypes {
@@ -38,11 +43,11 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -66,4 +71,15 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-gson:2.11.0")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+}
+
+fun getApiBaseUrl(): String {
+    val props = Properties()
+    val localFile = rootProject.file("api.properties")
+    return if (localFile.exists()) {
+        FileInputStream(localFile).use { props.load(it) }
+        props.getProperty("API_BASE_URL", "http://10.0.2.2:8080")
+    } else {
+        "http://10.0.2.2:8080"
+    }
 }
