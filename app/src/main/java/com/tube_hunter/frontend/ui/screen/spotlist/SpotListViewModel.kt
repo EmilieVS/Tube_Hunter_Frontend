@@ -13,6 +13,12 @@ class SpotListViewModel : ViewModel() {
     private val _spots = MutableStateFlow<List<SpotDetailsUi>>(emptyList())
     val spots: StateFlow<List<SpotDetailsUi>> = _spots
 
+    private val _selectedDifficulty = MutableStateFlow<Int?>(null)
+    val selectedDifficulty : StateFlow<Int?> = _selectedDifficulty
+
+    private val _selectedSurfBreak = MutableStateFlow<String?>(null)
+    val selectedSurfBreak : StateFlow<String?> = _selectedSurfBreak
+
     init {
         loadSpots()
     }
@@ -38,9 +44,26 @@ class SpotListViewModel : ViewModel() {
                     )
                 }
             } catch (e: Exception) {
-                Log.e("API_RESPONSE", "Error during request", e )
+                Log.e("API_RESPONSE", "Error during request", e)
                 e.printStackTrace()
             }
         }
     }
-}
+        fun setDifficulty(level: Int?) {
+            _selectedDifficulty.value = level
+        }
+
+        fun setSurfBreak(type: String?) {
+            _selectedSurfBreak.value = type
+        }
+
+        fun clearFilters() {
+            _selectedDifficulty.value = null
+            _selectedSurfBreak.value = null
+        }
+
+    }
+
+
+
+

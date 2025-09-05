@@ -77,6 +77,9 @@ fun SpotListScreen(onNavigate: (String) -> Unit, snackbarMessage: String = "", v
         }
     }
 
+    val selectedDifficulty by viewModel.selectedDifficulty.collectAsState()
+    val selectedSurfBreak by viewModel.selectedSurfBreak.collectAsState()
+
     LaunchedEffect(spots) {
         filteredSpots = spots
     }
@@ -139,18 +142,21 @@ fun SpotListScreen(onNavigate: (String) -> Unit, snackbarMessage: String = "", v
 
                 if (showFilterDialog) {
                     FilterDialog(
+                        selectedDifficulty = selectedDifficulty,
+                        selectedSurfBreak = selectedSurfBreak,
+                        onDifficultyChange = { viewModel.setDifficulty(it) },
+                        onSurfBreakChange = { viewModel.setSurfBreak(it) },
                         onDismiss = { showFilterDialog = false },
                         onConfirm = { difficulty, surfBreak ->
                             filteredSpots = spots.filter { spot ->
-                                val difficultyMatch =
-                                    difficulty == null || spot.difficulty == difficulty
-                                val surfBreakMatch =
-                                    surfBreak == null || spot.surfBreaks.contains(surfBreak)
+                                val difficultyMatch = difficulty == null || spot.difficulty == difficulty
+                                val surfBreakMatch = surfBreak == null || spot.surfBreaks.contains(surfBreak)
                                 difficultyMatch && surfBreakMatch
                             }
                             showFilterDialog = false
                         },
                         onClear = {
+                            viewModel.clearFilters()
                             filteredSpots = spots
                             showFilterDialog = false
                         }
@@ -268,13 +274,14 @@ fun SpotCard(spot: SpotDetailsUi, onClick: () -> Unit) {
 
 @Composable
 fun FilterDialog(
+    selectedDifficulty: Int?,
+    selectedSurfBreak: String?,
+    onDifficultyChange: (Int?) -> Unit,
+    onSurfBreakChange: (String?) -> Unit,
     onDismiss: () -> Unit,
     onConfirm: (Int?, String?) -> Unit,
     onClear: () -> Unit
 ) {
-    var selectedDifficulty by remember { mutableStateOf<Int?>(null) }
-    var selectedSurfBreak by remember { mutableStateOf<String?>(null) }
-
     AlertDialog(
         containerColor = WhiteFoam,
         textContentColor = DeepBlue,
@@ -288,7 +295,10 @@ fun FilterDialog(
                     (1..5).forEach { level ->
                         FilterChip(
                             selected = selectedDifficulty == level,
-                            onClick = { selectedDifficulty = level },
+                            onClick = {
+                                if (selectedDifficulty == level) onDifficultyChange(null)
+                                else onDifficultyChange(level)
+                            },
                             label = { Text(level.toString()) },
                             colors = FilterChipDefaults.filterChipColors(
                                 selectedContainerColor = LagoonBlue,
@@ -305,7 +315,10 @@ fun FilterDialog(
                     listOf("Point", "Beach", "Reef").forEach { type ->
                         FilterChip(
                             selected = selectedSurfBreak == type,
-                            onClick = { selectedSurfBreak = type },
+                            onClick = {
+                                if (selectedSurfBreak == type) onSurfBreakChange(null)
+                                else onSurfBreakChange(type)
+                            },
                             label = { Text(type) },
                             colors = FilterChipDefaults.filterChipColors(
                                 selectedContainerColor = LagoonBlue,
@@ -318,9 +331,7 @@ fun FilterDialog(
         },
         confirmButton = {
             Button(
-                onClick = {
-                    onConfirm(selectedDifficulty, selectedSurfBreak)
-                },
+                onClick = { onConfirm(selectedDifficulty, selectedSurfBreak) },
                 colors = ButtonDefaults.buttonColors(LagoonBlue, WhiteFoam)
             ) {
                 Text("Confirm")
@@ -328,11 +339,7 @@ fun FilterDialog(
         },
         dismissButton = {
             Button(
-                onClick = {
-                    selectedDifficulty = null
-                    selectedSurfBreak = null
-                    onClear()
-                },
+                onClick = { onClear() },
                 colors = ButtonDefaults.buttonColors(LagoonBlue, WhiteFoam)
             ) {
                 Text("Clear")
@@ -340,6 +347,7 @@ fun FilterDialog(
         }
     )
 }
+
 
 
 @Composable
