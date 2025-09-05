@@ -1,6 +1,7 @@
 package com.tube_hunter.frontend.ui.screen.spotlist
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -99,6 +100,22 @@ fun SpotListScreen(onNavigate: (String) -> Unit, snackbarMessage: String = "", v
             BrandTitle()
 
             Spacer(modifier = Modifier.weight(1f))
+
+            if (filteredSpots.isEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .background(color = WhiteFoam, shape = RoundedCornerShape(12.dp))
+                        .padding(16.dp)
+                        .fillMaxWidth(0.8f),
+                    contentAlignment = Alignment.Center
+                ){
+                    Text(text = "No result",
+                        color = DeepBlue,
+                        fontFamily = quicksand,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold)
+                }
+            }
 
             SpotList(filteredSpots, onNavigate)
 

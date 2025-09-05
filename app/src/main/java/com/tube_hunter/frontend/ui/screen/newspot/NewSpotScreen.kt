@@ -478,6 +478,9 @@ fun DifficultyDropdown(
 
     Box(modifier = Modifier.padding(start = 16.dp)) {
         Row(
+            modifier = Modifier
+                .clickable { expanded = !expanded }
+                .padding(horizontal = 12.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.End,
         ) {
