@@ -44,9 +44,6 @@ class NewSpotViewModel : ViewModel() {
     private val _isSuccess = MutableStateFlow(false)
     val isSuccess: StateFlow<Boolean> = _isSuccess
 
-    private val _formState = MutableStateFlow(SpotFormState())
-    val formState: StateFlow<SpotFormState> = _formState
-
     fun sendSpot(formSpot: SpotFormState) {
         viewModelScope.launch {
             try {
@@ -87,14 +84,6 @@ class NewSpotViewModel : ViewModel() {
                 _isSuccess.value = false
             }
         }
-    }
-
-    fun updateForm(newState: SpotFormState) {
-        _formState.value = newState
-    }
-
-    fun setImageUri(uri: Uri?) {
-        _formState.value = _formState.value.copy(imageUri = uri)
     }
 }
 

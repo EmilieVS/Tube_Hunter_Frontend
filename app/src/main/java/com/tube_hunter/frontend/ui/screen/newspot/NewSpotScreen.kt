@@ -611,7 +611,6 @@ fun SeasonDatePicker(
 }
 
 
-
 // ----------- A METTRE DANS VIEWMODEL ? -----------
 
 fun formatDateFromMillis(millis: Long): String {
