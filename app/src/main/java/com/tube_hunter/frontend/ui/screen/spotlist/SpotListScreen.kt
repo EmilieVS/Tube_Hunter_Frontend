@@ -64,7 +64,17 @@ import kotlinx.coroutines.launch
 @Composable
 fun SpotListScreen(onNavigate: (String) -> Unit, snackbarMessage: String = "", viewModel: SpotListViewModel = viewModel()) {
     val spots by viewModel.spots.collectAsState()
-    var filteredSpots by remember { mutableStateOf<List<SpotDetailsUi>>(emptyList()) }
+
+    val selectedDifficulty by viewModel.selectedDifficulty.collectAsState(initial = null)
+    val selectedSurfBreak by viewModel.selectedSurfBreak.collectAsState(initial = null)
+    val filteredSpots = remember(spots, selectedDifficulty, selectedSurfBreak) {
+        spots.filter { spot ->
+            val difficultyMatch = selectedDifficulty == null || spot.difficulty == selectedDifficulty
+            val surfBreakMatch = selectedSurfBreak.isNullOrBlank() || spot.surfBreaks.contains(selectedSurfBreak ?: "", ignoreCase = true)
+            difficultyMatch && surfBreakMatch
+        }
+    }
+
     var showFilterDialog by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
@@ -75,13 +85,6 @@ fun SpotListScreen(onNavigate: (String) -> Unit, snackbarMessage: String = "", v
                 snackbarHostState.showSnackbar(snackbarMessage)
             }
         }
-    }
-
-    val selectedDifficulty by viewModel.selectedDifficulty.collectAsState()
-    val selectedSurfBreak by viewModel.selectedSurfBreak.collectAsState()
-
-    LaunchedEffect(spots) {
-        filteredSpots = spots
     }
 
     Box(
@@ -148,16 +151,12 @@ fun SpotListScreen(onNavigate: (String) -> Unit, snackbarMessage: String = "", v
                         onSurfBreakChange = { viewModel.setSurfBreak(it) },
                         onDismiss = { showFilterDialog = false },
                         onConfirm = { difficulty, surfBreak ->
-                            filteredSpots = spots.filter { spot ->
-                                val difficultyMatch = difficulty == null || spot.difficulty == difficulty
-                                val surfBreakMatch = surfBreak == null || spot.surfBreaks.contains(surfBreak)
-                                difficultyMatch && surfBreakMatch
-                            }
+                            viewModel.setDifficulty(difficulty)
+                            viewModel.setSurfBreak(surfBreak)
                             showFilterDialog = false
                         },
                         onClear = {
                             viewModel.clearFilters()
-                            filteredSpots = spots
                             showFilterDialog = false
                         }
                     )

@@ -67,6 +67,7 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.tube_hunter.frontend.R
 import com.tube_hunter.frontend.ui.component.BrandTitle
@@ -81,7 +82,7 @@ import java.util.Date
 import java.util.Locale
 
 @Composable
-fun NewSpotScreen(onNavigate: (String) -> Unit, viewModel: NewSpotViewModel = viewModel()) {
+fun NewSpotScreen(navController: NavController, viewModel: NewSpotViewModel = viewModel()) {
     var formState by remember { mutableStateOf(SpotFormState()) }
     val uiMessage by viewModel.uiMessage.collectAsState()
     val isSuccess by viewModel.isSuccess.collectAsState()
@@ -97,7 +98,9 @@ fun NewSpotScreen(onNavigate: (String) -> Unit, viewModel: NewSpotViewModel = vi
     }
     LaunchedEffect(isSuccess) {
         if (isSuccess) {
-            onNavigate(Screen.SpotList.route + "?message=✅ Spot added successfully")
+            navController.navigate(Screen.SpotList.route + "?message=✅ Spot added successfully") {
+                popUpTo(Screen.SpotList.route) { inclusive = true }
+            }
         }
     }
 
@@ -132,7 +135,7 @@ fun NewSpotScreen(onNavigate: (String) -> Unit, viewModel: NewSpotViewModel = vi
             Row {
                 Button(
                     onClick = {
-                        onNavigate(Screen.SpotList.route)
+                        navController.popBackStack()
                     },
                     colors = ButtonDefaults.buttonColors(WhiteFoam, DeepBlue),
                     modifier = Modifier.padding(bottom = 48.dp)
