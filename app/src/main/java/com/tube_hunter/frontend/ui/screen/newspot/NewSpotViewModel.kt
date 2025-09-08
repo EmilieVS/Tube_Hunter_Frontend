@@ -14,7 +14,6 @@ import kotlinx.serialization.json.Json
 import org.json.JSONObject
 
 data class SpotFormState(
-//    val imageUrl: String = "",
     val imageUri: Uri? = null,
     val spotName: String = "",
     val city: String = "",

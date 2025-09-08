@@ -180,7 +180,6 @@ fun NewSpotScreen(onNavigate: (String) -> Unit, viewModel: NewSpotViewModel = vi
         )
     }
 }
-
 @Composable
 fun NewSpotCard(
     formState: SpotFormState,
