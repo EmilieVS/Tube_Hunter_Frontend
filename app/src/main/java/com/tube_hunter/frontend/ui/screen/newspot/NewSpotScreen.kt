@@ -63,6 +63,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -149,10 +150,10 @@ fun NewSpotScreen(onNavigate: (String) -> Unit, viewModel: NewSpotViewModel = vi
                 }
 
                 Spacer(modifier = Modifier.width(16.dp))
-
+                val context =   LocalContext.current
                 Button(
                     onClick = {
-                        viewModel.sendSpot(formState)
+                        viewModel.sendSpot(context,formState)
                     },
                     enabled = formState.isValid(),
                     colors = ButtonDefaults.buttonColors(
