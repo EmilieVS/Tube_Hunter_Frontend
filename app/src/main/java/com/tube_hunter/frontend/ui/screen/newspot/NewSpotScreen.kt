@@ -38,6 +38,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -46,9 +48,12 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -58,6 +63,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -69,6 +75,7 @@ import com.tube_hunter.frontend.ui.theme.DeepBlue
 import com.tube_hunter.frontend.ui.theme.LagoonBlue
 import com.tube_hunter.frontend.ui.theme.WhiteFoam
 import com.tube_hunter.frontend.ui.theme.quicksand
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -76,6 +83,23 @@ import java.util.Locale
 @Composable
 fun NewSpotScreen(onNavigate: (String) -> Unit, viewModel: NewSpotViewModel = viewModel()) {
     var formState by remember { mutableStateOf(SpotFormState()) }
+    val uiMessage by viewModel.uiMessage.collectAsState()
+    val isSuccess by viewModel.isSuccess.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
+
+    LaunchedEffect(uiMessage) {
+        uiMessage?.let { msg ->
+            coroutineScope.launch {
+                snackbarHostState.showSnackbar(msg)
+            }
+        }
+    }
+    LaunchedEffect(isSuccess) {
+        if (isSuccess) {
+            onNavigate(Screen.SpotList.route + "?message=✅ Spot added successfully")
+        }
+    }
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -126,7 +150,6 @@ fun NewSpotScreen(onNavigate: (String) -> Unit, viewModel: NewSpotViewModel = vi
                 Button(
                     onClick = {
                         viewModel.sendSpot(formState)
-                        onNavigate(Screen.SpotList.route)
                     },
                     enabled = formState.isValid(),
                     colors = ButtonDefaults.buttonColors(
@@ -146,6 +169,12 @@ fun NewSpotScreen(onNavigate: (String) -> Unit, viewModel: NewSpotViewModel = vi
                 }
             }
         }
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(16.dp)
+        )
     }
 }
 
@@ -434,7 +463,10 @@ fun Checkboxes(
                     ),
                 )
 
-                Text(surfBreak)
+                Text(
+                    surfBreak,
+                    fontSize = 16.sp
+                )
             }
         }
     }
@@ -448,49 +480,54 @@ fun DifficultyDropdown(
 ) {
     var expanded by remember { mutableStateOf(false) }
 
-    Box(modifier = Modifier.padding(start = 16.dp)) {
+    Box {
         Row(
             modifier = Modifier
                 .clickable { expanded = !expanded }
-                .padding(horizontal = 12.dp, vertical = 8.dp),
+                .padding(horizontal = 16.dp, vertical = 16.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.End,
+            horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             Text(
                 text = if (selected > 0) selected.toString() else "Select",
-                color = WhiteFoam
+                color = WhiteFoam,
+                fontSize = 16.sp
             )
 
-            IconButton(onClick = { expanded = !expanded }) {
-                Icon(
-                    Icons.Default.KeyboardArrowDown,
-                    tint = WhiteFoam,
-                    contentDescription = "Difficulty"
-                )
-            }
+            Icon(
+                Icons.Default.KeyboardArrowDown,
+                tint = WhiteFoam,
+                contentDescription = "Difficulty"
+            )
         }
 
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
-            modifier = Modifier.background(WhiteFoam)
+            modifier = Modifier.background(WhiteFoam),
+            offset =  DpOffset(x = 20.dp, y = 0.dp)
         ) {
             (1..5).forEach { value ->
                 DropdownMenuItem(
                     text = {
-                        Text(
-                            value.toString(),
-                            fontSize = 14.sp,
-                            modifier = Modifier.padding(4.dp)
-                        )
+                        Box(
+                            modifier = Modifier.fillMaxWidth(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                value.toString(),
+                                fontSize = 16.sp,
+                                modifier = Modifier.padding(4.dp),
+                            )
+                        }
                     },
                     onClick = {
                         onValueChange(value)
                         expanded = false
                     },
                     modifier = Modifier
-                        .height(32.dp)
-                        .width(60.dp)
+                        .height(30.dp)
+                        .width(56.dp)
                 )
             }
         }

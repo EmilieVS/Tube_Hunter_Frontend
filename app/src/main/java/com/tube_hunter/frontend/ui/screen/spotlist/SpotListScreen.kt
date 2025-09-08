@@ -1,6 +1,5 @@
 package com.tube_hunter.frontend.ui.screen.spotlist
 
-import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -30,7 +29,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.SearchBarDefaults
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -38,13 +38,13 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -54,7 +54,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.tube_hunter.frontend.R
-import com.tube_hunter.frontend.data.model.Welcome
 import com.tube_hunter.frontend.ui.component.BrandTitle
 import com.tube_hunter.frontend.ui.component.SpotDetailsUi
 import com.tube_hunter.frontend.ui.navigation.Screen
@@ -62,13 +61,26 @@ import com.tube_hunter.frontend.ui.theme.DeepBlue
 import com.tube_hunter.frontend.ui.theme.LagoonBlue
 import com.tube_hunter.frontend.ui.theme.WhiteFoam
 import com.tube_hunter.frontend.ui.theme.quicksand
-import kotlinx.serialization.json.Json
+import kotlinx.coroutines.launch
 
 @Composable
-fun SpotListScreen(onNavigate: (String) -> Unit, viewModel: SpotListViewModel = viewModel()) {
+fun SpotListScreen(onNavigate: (String) -> Unit, snackbarMessage: String = "", viewModel: SpotListViewModel = viewModel()) {
     val spots by viewModel.spots.collectAsState()
     var filteredSpots by remember { mutableStateOf<List<SpotDetailsUi>>(emptyList()) }
     var showFilterDialog by remember { mutableStateOf(false) }
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
+
+    LaunchedEffect(snackbarMessage) {
+        if (snackbarMessage.isNotBlank()) {
+            coroutineScope.launch {
+                snackbarHostState.showSnackbar(snackbarMessage)
+            }
+        }
+    }
+
+    val selectedDifficulty by viewModel.selectedDifficulty.collectAsState()
+    val selectedSurfBreak by viewModel.selectedSurfBreak.collectAsState()
 
     LaunchedEffect(spots) {
         filteredSpots = spots
@@ -132,18 +144,21 @@ fun SpotListScreen(onNavigate: (String) -> Unit, viewModel: SpotListViewModel = 
 
                 if (showFilterDialog) {
                     FilterDialog(
+                        selectedDifficulty = selectedDifficulty,
+                        selectedSurfBreak = selectedSurfBreak,
+                        onDifficultyChange = { viewModel.setDifficulty(it) },
+                        onSurfBreakChange = { viewModel.setSurfBreak(it) },
                         onDismiss = { showFilterDialog = false },
                         onConfirm = { difficulty, surfBreak ->
                             filteredSpots = spots.filter { spot ->
-                                val difficultyMatch =
-                                    difficulty == null || spot.difficulty == difficulty
-                                val surfBreakMatch =
-                                    surfBreak == null || spot.surfBreaks.contains(surfBreak)
+                                val difficultyMatch = difficulty == null || spot.difficulty == difficulty
+                                val surfBreakMatch = surfBreak == null || spot.surfBreaks.contains(surfBreak)
                                 difficultyMatch && surfBreakMatch
                             }
                             showFilterDialog = false
                         },
                         onClear = {
+                            viewModel.clearFilters()
                             filteredSpots = spots
                             showFilterDialog = false
                         }
@@ -170,6 +185,13 @@ fun SpotListScreen(onNavigate: (String) -> Unit, viewModel: SpotListViewModel = 
                 }
             }
         }
+
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(16.dp)
+        )
     }
 }
 
@@ -254,13 +276,14 @@ fun SpotCard(spot: SpotDetailsUi, onClick: () -> Unit) {
 
 @Composable
 fun FilterDialog(
+    selectedDifficulty: Int?,
+    selectedSurfBreak: String?,
+    onDifficultyChange: (Int?) -> Unit,
+    onSurfBreakChange: (String?) -> Unit,
     onDismiss: () -> Unit,
     onConfirm: (Int?, String?) -> Unit,
     onClear: () -> Unit
 ) {
-    var selectedDifficulty by remember { mutableStateOf<Int?>(null) }
-    var selectedSurfBreak by remember { mutableStateOf<String?>(null) }
-
     AlertDialog(
         containerColor = WhiteFoam,
         textContentColor = DeepBlue,
@@ -274,7 +297,10 @@ fun FilterDialog(
                     (1..5).forEach { level ->
                         FilterChip(
                             selected = selectedDifficulty == level,
-                            onClick = { selectedDifficulty = level },
+                            onClick = {
+                                if (selectedDifficulty == level) onDifficultyChange(null)
+                                else onDifficultyChange(level)
+                            },
                             label = { Text(level.toString()) },
                             colors = FilterChipDefaults.filterChipColors(
                                 selectedContainerColor = LagoonBlue,
@@ -291,7 +317,10 @@ fun FilterDialog(
                     listOf("Point", "Beach", "Reef").forEach { type ->
                         FilterChip(
                             selected = selectedSurfBreak == type,
-                            onClick = { selectedSurfBreak = type },
+                            onClick = {
+                                if (selectedSurfBreak == type) onSurfBreakChange(null)
+                                else onSurfBreakChange(type)
+                            },
                             label = { Text(type) },
                             colors = FilterChipDefaults.filterChipColors(
                                 selectedContainerColor = LagoonBlue,
@@ -304,9 +333,7 @@ fun FilterDialog(
         },
         confirmButton = {
             Button(
-                onClick = {
-                    onConfirm(selectedDifficulty, selectedSurfBreak)
-                },
+                onClick = { onConfirm(selectedDifficulty, selectedSurfBreak) },
                 colors = ButtonDefaults.buttonColors(LagoonBlue, WhiteFoam)
             ) {
                 Text("Confirm")
@@ -314,11 +341,7 @@ fun FilterDialog(
         },
         dismissButton = {
             Button(
-                onClick = {
-                    selectedDifficulty = null
-                    selectedSurfBreak = null
-                    onClear()
-                },
+                onClick = { onClear() },
                 colors = ButtonDefaults.buttonColors(LagoonBlue, WhiteFoam)
             ) {
                 Text("Clear")
@@ -356,6 +379,7 @@ fun SearchBar(){
         content = content,
     )
 }
+
 
 @Composable
 fun IconDifficulty(rating: Int) {
