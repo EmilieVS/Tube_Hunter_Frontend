@@ -1,6 +1,7 @@
 package com.tube_hunter.frontend.ui.screen.newspot
 
 import ApiError
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
@@ -13,7 +14,8 @@ import kotlinx.serialization.json.Json
 import org.json.JSONObject
 
 data class SpotFormState(
-    val imageUrl: String = "",
+//    val imageUrl: String = "",
+    val imageUri: Uri? = null,
     val spotName: String = "",
     val city: String = "",
     val country: String = "",
@@ -23,7 +25,7 @@ data class SpotFormState(
     val seasonEnd: Long? = null
 ) {
     fun isValid(): Boolean {
-        return imageUrl.isNotBlank()
+        return imageUri != null
                 && spotName.isNotBlank()
                 && city.isNotBlank()
                 && country.isNotBlank()
@@ -42,12 +44,22 @@ class NewSpotViewModel : ViewModel() {
     private val _isSuccess = MutableStateFlow(false)
     val isSuccess: StateFlow<Boolean> = _isSuccess
 
+    private val _formState = MutableStateFlow(SpotFormState())
+    val formState: StateFlow<SpotFormState> = _formState
+
     fun sendSpot(formSpot: SpotFormState) {
         viewModelScope.launch {
             try {
+
+                val photoUrl = if (formSpot.imageUri != null) {
+                    formSpot.imageUri.toString()
+                } else {
+                    ""
+                }
+
                 val spotRequest = SpotDetailsUi(
                     id = 0,
-                    photoUrl = formSpot.imageUrl,
+                    photoUrl = photoUrl,
                     name = formSpot.spotName,
                     city = formSpot.city,
                     country = formSpot.country,
@@ -75,6 +87,14 @@ class NewSpotViewModel : ViewModel() {
                 _isSuccess.value = false
             }
         }
+    }
+
+    fun updateForm(newState: SpotFormState) {
+        _formState.value = newState
+    }
+
+    fun setImageUri(uri: Uri?) {
+        _formState.value = _formState.value.copy(imageUri = uri)
     }
 }
 

@@ -2,6 +2,9 @@
 
 package com.tube_hunter.frontend.ui.screen.newspot
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import com.tube_hunter.frontend.ui.navigation.Screen
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.foundation.Image
@@ -197,8 +200,8 @@ fun NewSpotCard(
             horizontalAlignment = Alignment.Start
         ) {
             AddImage(
-                imageUrl = formState.imageUrl,
-                onImageChange = { onFormChange(formState.copy(imageUrl = it)) }
+                imageUri = formState.imageUri,
+                onImageChange = { onFormChange(formState.copy(imageUri = it)) }
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -354,11 +357,14 @@ fun NewSpotCard(
 
 @Composable
 fun AddImage(
-    imageUrl: String,
-    onImageChange: (String) -> Unit
+    imageUri: Uri?,
+    onImageChange: (Uri?) -> Unit
 ) {
-    var userInput by remember { mutableStateOf(false) }
-    var inputText by remember { mutableStateOf("") }
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        onImageChange(uri)
+    }
 
     Box(
         modifier = Modifier
@@ -366,72 +372,28 @@ fun AddImage(
             .height(180.dp)
             .clip(RoundedCornerShape(12.dp))
             .background(LagoonBlue)
-            .clickable { userInput = true },
+            .clickable { launcher.launch("image/*") },
         contentAlignment = Alignment.Center
     ) {
-        if (imageUrl.isNotBlank()) {
+        if (imageUri != null) {
             AsyncImage(
-                model = imageUrl,
+                model = imageUri,
                 contentDescription = "Spot image",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(8.dp))
-                    .height(180.dp),
+                modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(8.dp)),
                 contentScale = ContentScale.Crop
             )
         } else {
-            if (userInput) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    TextField(
-                        value = inputText,
-                        onValueChange = { inputText = it },
-                        placeholder = { Text("Insert your image URL") },
-                        colors = TextFieldDefaults.colors(
-                            focusedContainerColor = WhiteFoam,
-                            unfocusedContainerColor = WhiteFoam,
-                            focusedLabelColor = DeepBlue,
-                            unfocusedLabelColor = DeepBlue,
-                            focusedTextColor = DeepBlue,
-                            unfocusedTextColor = DeepBlue,
-                            cursorColor = DeepBlue
-                        ),
-                        modifier = Modifier
-                            .fillMaxWidth(0.8f)
-                            .background(Color.White, RoundedCornerShape(8.dp))
-                    )
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    Button(
-                        onClick = {
-                            onImageChange(inputText.trim())
-                            userInput = false
-                        },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = WhiteFoam,
-                            contentColor = DeepBlue
-                        )
-                    ) {
-                        Text("Confirm")
-                    }
-                }
-            } else {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Icon(
-                        imageVector = Icons.Default.PhotoCamera,
-                        contentDescription = "Add Image",
-                        tint = WhiteFoam,
-                        modifier = Modifier.size(48.dp)
-                    )
-                    Text(
-                        text = if (imageUrl.isNotBlank()) imageUrl else "Add image",
-                        color = WhiteFoam,
-                        fontFamily = quicksand,
-                        fontSize = 16.sp,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(top = 8.dp)
-                    )
-                }
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Icon(
+                    imageVector = Icons.Default.PhotoCamera,
+                    contentDescription = "Add Image",
+                    tint = WhiteFoam,
+                    modifier = Modifier.size(48.dp)
+                )
+                Text(
+                    text = "Add image",
+                    color = WhiteFoam
+                )
             }
         }
     }
@@ -647,6 +609,8 @@ fun SeasonDatePicker(
         )
     }
 }
+
+
 
 // ----------- A METTRE DANS VIEWMODEL ? -----------
 
