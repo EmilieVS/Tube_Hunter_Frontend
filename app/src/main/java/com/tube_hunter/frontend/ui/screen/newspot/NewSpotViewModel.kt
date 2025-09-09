@@ -122,12 +122,4 @@ class NewSpotViewModel : ViewModel() {
 }
 
 
-// Ce qu'on fait concrètement :
-// On ouvre le flux de données pour récupérer l'image sélectionnée
-// On ferme le flux pour libérer les ressourses et éviter les fuites mémoire
-// On envoie cette image au back via Retrofit en multiPart
-// Le back la récupère, la stocke dans le fichier indiqué
-// On génère une adresse et un nom unique que l'on stocke dans la BDD pour accéder à l'image
-// En appelant le spot : le back a un path vers le fichier et c'est lui qui est stocké, pas le fichier lui-même
 
-// Il faut carrément refactoriser et ptet faire une fonction UploadImage à part mais ça marche !!
