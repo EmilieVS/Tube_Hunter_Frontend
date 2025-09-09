@@ -51,43 +51,37 @@ class NewSpotViewModel : ViewModel() {
         viewModelScope.launch {
             try {
 
-//                val photoUrl = if (formSpot.imageUri != null) {
-//                    formSpot.imageUri.toString()
-//                } else {
-//                    ""
-//                }
-                var photoUrl =""
+                var photoUri =""
 
                 formSpot.imageUri?.let { uri ->
-                    // 1. Ouvrir l'image sélectionnée dans un flux de lecture
+                    // 1. Ouvrir l'image sélectionnée : lecture des données depuis la gallerie
                     val inputStream = context.contentResolver.openInputStream(uri)
 
-                    // 2. Lire tous les octets de l'image
+                    // 2. Lire les octets de l'image et récupérer l'image elle même et non plus un pointeur
                     val bytes = inputStream?.readBytes()
 
-                    // 3. Fermer le flux (important pour libérer les ressources)
+                    // 3. Fermer le flux ouvert (pour libérer les ressources)
                     inputStream?.close()
 
                     // 4. Si on a bien récupéré les octets
                     if (bytes != null) {
-                        // Transformer les octets en "RequestBody" que Retrofit peut envoyer
+                        // Transformer les octets en "RequestBody" que Retrofit va envoyer
                         val requestBody = bytes.toRequestBody("image/*".toMediaTypeOrNull())
 
-                        // Créer la partie multipart avec un nom de fichier unique
+                        // Créer la partie multipart et un nom de fichier unique
                         val filePart = MultipartBody.Part.createFormData(
-                            "image",                                // clé attendue par ton back
+                            "image", // clé attendue par le back
                             "spot_${System.currentTimeMillis()}.jpg", // nom de fichier
                             requestBody
                         )
-
                         // 5. Envoyer l'image au serveur
                         val uploadResponse = ApiClient.api.uploadImage(filePart)
 
-                        // 6. Si l'upload a réussi, on récupère l'URL envoyée par ton back
+                        // 6. Si l'upload a réussi, on récupère l'URL envoyée par le back
                         if (uploadResponse.isSuccessful) {
-                            photoUrl = uploadResponse.body()?.photoUrl ?: ""
+                            photoUri = uploadResponse.body()?.photoUrl ?: ""
                         } else {
-                            _uiMessage.value = "Erreur lors de l'upload de l'image"
+                            _uiMessage.value = "Failed to upload"
                             _isSuccess.value = false
                             return@launch
                         }
@@ -96,7 +90,7 @@ class NewSpotViewModel : ViewModel() {
 
                 val spotRequest = SpotDetailsUi(
                     id = 0,
-                    photoUrl = photoUrl,
+                    photoUrl = photoUri,
                     name = formSpot.spotName,
                     city = formSpot.city,
                     country = formSpot.country,
@@ -127,3 +121,13 @@ class NewSpotViewModel : ViewModel() {
     }
 }
 
+
+// Ce qu'on fait concrètement :
+// On ouvre le flux de données pour récupérer l'image sélectionnée
+// On ferme le flux pour libérer les ressourses et éviter les fuites mémoire
+// On envoie cette image au back via Retrofit en multiPart
+// Le back la récupère, la stocke dans le fichier indiqué
+// On génère une adresse et un nom unique que l'on stocke dans la BDD pour accéder à l'image
+// En appelant le spot : le back a un path vers le fichier et c'est lui qui est stocké, pas le fichier lui-même
+
+// Il faut carrément refactoriser et ptet faire une fonction UploadImage à part mais ça marche !!

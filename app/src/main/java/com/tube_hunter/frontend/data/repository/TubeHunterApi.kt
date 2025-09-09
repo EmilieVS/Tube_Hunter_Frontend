@@ -23,7 +23,7 @@ interface TubeHunterApi {
     @POST("api/spots")
     suspend fun addSpot(@Body spot: SpotDetailsUi)
 
-    // Nouvel endpoint pour uploader limage
+    // Nouvel endpoint pour uploader l'image
     @Multipart
     @POST("api/upload")
     suspend fun uploadImage(
