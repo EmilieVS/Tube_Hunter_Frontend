@@ -46,8 +46,6 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
@@ -61,7 +59,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -75,7 +72,6 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.tube_hunter.frontend.R
 import com.tube_hunter.frontend.ui.component.BrandTitle
-import com.tube_hunter.frontend.ui.screen.spotlist.SpotListViewModel
 import com.tube_hunter.frontend.ui.theme.DeepBlue
 import com.tube_hunter.frontend.ui.theme.LagoonBlue
 import com.tube_hunter.frontend.ui.theme.WhiteFoam

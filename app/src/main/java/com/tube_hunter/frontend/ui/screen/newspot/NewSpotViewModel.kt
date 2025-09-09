@@ -40,7 +40,6 @@ data class SpotFormState(
 }
 
 class NewSpotViewModel : ViewModel() {
-
     private val _uiMessage = MutableStateFlow<String?>(null)
     val uiMessage: StateFlow<String?> = _uiMessage
 
@@ -50,34 +49,23 @@ class NewSpotViewModel : ViewModel() {
     fun sendSpot(context: Context, formSpot: SpotFormState) {
         viewModelScope.launch {
             try {
-
                 var photoUri =""
 
                 formSpot.imageUri?.let { uri ->
-                    // 1. Ouvrir l'image sélectionnée : lecture des données depuis la gallerie
                     val inputStream = context.contentResolver.openInputStream(uri)
-
-                    // 2. Lire les octets de l'image et récupérer l'image elle même et non plus un pointeur
                     val bytes = inputStream?.readBytes()
 
-                    // 3. Fermer le flux ouvert (pour libérer les ressources)
                     inputStream?.close()
 
-                    // 4. Si on a bien récupéré les octets
                     if (bytes != null) {
-                        // Transformer les octets en "RequestBody" que Retrofit va envoyer
                         val requestBody = bytes.toRequestBody("image/*".toMediaTypeOrNull())
-
-                        // Créer la partie multipart et un nom de fichier unique
                         val filePart = MultipartBody.Part.createFormData(
-                            "image", // clé attendue par le back
-                            "spot_${System.currentTimeMillis()}.jpg", // nom de fichier
+                            "image",
+                            "spot_${System.currentTimeMillis()}.jpg",
                             requestBody
                         )
-                        // 5. Envoyer l'image au serveur
                         val uploadResponse = ApiClient.api.uploadImage(filePart)
 
-                        // 6. Si l'upload a réussi, on récupère l'URL envoyée par le back
                         if (uploadResponse.isSuccessful) {
                             photoUri = uploadResponse.body()?.photoUrl ?: ""
                         } else {
@@ -99,9 +87,7 @@ class NewSpotViewModel : ViewModel() {
                     seasonStart = formSpot.seasonStart?.toString() ?: "",
                     seasonEnd = formSpot.seasonEnd?.toString() ?: ""
                 )
-
                 val response = ApiClient.api.addSpot(spotRequest)
-
                 val jsonString = Gson().toJson(response)
                 val json = JSONObject(jsonString)
                 _uiMessage.value = json.optString("message") //spot added successfuly
