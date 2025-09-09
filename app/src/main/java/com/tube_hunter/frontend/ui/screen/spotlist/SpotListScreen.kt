@@ -1,5 +1,8 @@
 package com.tube_hunter.frontend.ui.screen.spotlist
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -372,3 +375,4 @@ fun IconDifficulty(rating: Int) {
         }
     }
 }
+
