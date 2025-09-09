@@ -86,6 +86,7 @@ fun SpotListScreen(onNavigate: (String) -> Unit, snackbarMessage: String = "", v
         if (snackbarMessage.isNotBlank()) {
             coroutineScope.launch {
                 snackbarHostState.showSnackbar(snackbarMessage)
+                onNavigate(Screen.SpotList.route)
             }
         }
     }
