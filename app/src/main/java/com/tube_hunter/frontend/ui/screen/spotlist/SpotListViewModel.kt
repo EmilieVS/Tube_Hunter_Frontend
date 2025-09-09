@@ -6,18 +6,16 @@ import androidx.lifecycle.viewModelScope
 import com.tube_hunter.frontend.data.api.ApiClient
 import com.tube_hunter.frontend.ui.component.SpotDetailsUi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class SpotListViewModel : ViewModel() {
     private val _spots = MutableStateFlow<List<SpotDetailsUi>>(emptyList())
     val spots: StateFlow<List<SpotDetailsUi>> = _spots
-
-    private val _selectedDifficulty = MutableStateFlow<Int?>(null)
-    val selectedDifficulty : StateFlow<Int?> = _selectedDifficulty
-
-    private val _selectedSurfBreak = MutableStateFlow<String?>(null)
-    val selectedSurfBreak : StateFlow<String?> = _selectedSurfBreak
 
     init {
         loadSpots()
@@ -49,21 +47,64 @@ class SpotListViewModel : ViewModel() {
             }
         }
     }
-        fun setDifficulty(level: Int?) {
-            _selectedDifficulty.value = level
-        }
 
-        fun setSurfBreak(type: String?) {
-            _selectedSurfBreak.value = type
-        }
+    private val _selectedDifficulty = MutableStateFlow<Int?>(null)
+    val selectedDifficulty: StateFlow<Int?> = _selectedDifficulty
 
-        fun clearFilters() {
-            _selectedDifficulty.value = null
-            _selectedSurfBreak.value = null
-        }
+    private val _selectedSurfBreak = MutableStateFlow<String?>(null)
+    val selectedSurfBreak: StateFlow<String?> = _selectedSurfBreak
 
+    private val _selectedCountry = MutableStateFlow<String?>(null)
+    val selectedCountry: StateFlow<String?> = _selectedCountry
+
+    private val _countryQuery = MutableStateFlow("")
+    val countryQuery: StateFlow<String> = _countryQuery
+
+    val allCountries: StateFlow<List<String>> = _spots
+        .map { spots -> spots.map { it.country }.distinct() }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    val filteredCountries: StateFlow<List<String>> =
+        combine(_countryQuery, allCountries) { query, countries ->
+            if (query.isBlank()) {
+                emptyList()
+            } else {
+                countries.filter { it.contains(query, ignoreCase = true) }
+            }
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    fun onCountryQueryChanged(query: String) {
+        _countryQuery.value = query
     }
 
+    fun onCountrySelected(country: String) {
+        _selectedCountry.value = country
+        _countryQuery.value = country
+    }
 
+    fun setDifficulty(level: Int?) {
+        _selectedDifficulty.value = level
+    }
 
+    fun setSurfBreak(type: String?) {
+        _selectedSurfBreak.value = type
+    }
 
+    fun clearFilters() {
+        _selectedDifficulty.value = null
+        _selectedSurfBreak.value = null
+        _selectedCountry.value = null
+        _countryQuery.value = ""
+    }
+
+    val filteredSpots: StateFlow<List<SpotDetailsUi>> = combine(
+        _spots, _selectedDifficulty, _selectedSurfBreak, _selectedCountry
+    ) { spots, difficulty, surfBreak, country ->
+        spots.filter { spot ->
+            val matchDifficulty = difficulty?.let { spot.difficulty == it } ?: true
+            val matchSurfBreak = surfBreak?.let { spot.surfBreaks.contains(it, ignoreCase = true) } ?: true
+            val matchCountry = country?.let { spot.country.equals(it, ignoreCase = true) } ?: true
+            matchDifficulty && matchSurfBreak && matchCountry
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+}
