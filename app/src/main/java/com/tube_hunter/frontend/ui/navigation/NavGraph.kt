@@ -60,7 +60,7 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
                 defaultValue = -1L
             })
         ) { backStackEntry ->
-            val spotId = backStackEntry.arguments?.getLong("spotId") ?: -1L
+            val spotId = backStackEntry.arguments?.getLong("spotId") ?: -1L // we get spotId argument, if missing value = -1L
             val parentEntry = remember(backStackEntry) {
                 navController.getBackStackEntry(Screen.SpotList.route)
             }
