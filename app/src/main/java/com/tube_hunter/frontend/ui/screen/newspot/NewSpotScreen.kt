@@ -77,9 +77,7 @@ import com.tube_hunter.frontend.ui.theme.LagoonBlue
 import com.tube_hunter.frontend.ui.theme.WhiteFoam
 import com.tube_hunter.frontend.ui.theme.quicksand
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+
 
 @Composable
 fun NewSpotScreen(navController: NavController, viewModel: NewSpotViewModel = viewModel()) {
@@ -127,7 +125,8 @@ fun NewSpotScreen(navController: NavController, viewModel: NewSpotViewModel = vi
 
             NewSpotCard(
                 formState = formState,
-                onFormChange = { formState = it }
+                onFormChange = { formState = it },
+                viewModel = viewModel
             )
 
             Spacer(modifier = Modifier.weight(1f))
@@ -184,7 +183,8 @@ fun NewSpotScreen(navController: NavController, viewModel: NewSpotViewModel = vi
 @Composable
 fun NewSpotCard(
     formState: SpotFormState,
-    onFormChange: (SpotFormState) -> Unit
+    onFormChange: (SpotFormState) -> Unit,
+    viewModel: NewSpotViewModel
 ) {
     Card(
         modifier = Modifier
@@ -348,7 +348,8 @@ fun NewSpotCard(
                     endDate = formState.seasonEnd,
                     onValueChange = { start, end ->
                         onFormChange(formState.copy(seasonStart = start, seasonEnd = end))
-                    }
+                    },
+                    viewModel = viewModel
                 )
             }
         }
@@ -534,7 +535,8 @@ fun DatePickerModal(onDateSelected: (Long?) -> Unit, onDismiss: () -> Unit) {
 fun SeasonDatePicker(
     startDate: Long?,
     endDate: Long?,
-    onValueChange: (Long?, Long?) -> Unit
+    onValueChange: (Long?, Long?) -> Unit,
+    viewModel: NewSpotViewModel
 ) {
     var startDatePicker by remember { mutableStateOf(false) }
     var endDatePicker by remember { mutableStateOf(false) }
@@ -554,7 +556,7 @@ fun SeasonDatePicker(
             Text(
                 modifier = Modifier.padding(12.dp),
                 textAlign = TextAlign.Center,
-                text = startDate?.let { formatDateFromMillis(it) } ?: "Start",
+                text = startDate?.let { viewModel.formatDateFromMillis(it) } ?: "Start",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = WhiteFoam,
@@ -579,7 +581,7 @@ fun SeasonDatePicker(
             Text(
                 modifier = Modifier.padding(12.dp),
                 textAlign = TextAlign.Center,
-                text = endDate?.let { formatDateFromMillis(it) } ?: "End",
+                text = endDate?.let { viewModel.formatDateFromMillis(it) } ?: "End",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = WhiteFoam,
@@ -610,10 +612,5 @@ fun SeasonDatePicker(
     }
 }
 
-// ----------- A METTRE DANS VIEWMODEL ? -----------
 
-fun formatDateFromMillis(millis: Long): String {
-    val date = Date(millis)
-    val formatter = SimpleDateFormat("dd MMM", Locale.getDefault())
-    return formatter.format(date)
-}
+
