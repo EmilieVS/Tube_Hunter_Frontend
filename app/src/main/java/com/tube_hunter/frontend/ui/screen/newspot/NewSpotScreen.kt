@@ -5,8 +5,6 @@ package com.tube_hunter.frontend.ui.screen.newspot
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import com.tube_hunter.frontend.ui.navigation.Screen
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -36,8 +34,8 @@ import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -72,14 +70,12 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.tube_hunter.frontend.R
 import com.tube_hunter.frontend.ui.component.BrandTitle
+import com.tube_hunter.frontend.ui.navigation.Screen
 import com.tube_hunter.frontend.ui.theme.DeepBlue
 import com.tube_hunter.frontend.ui.theme.LagoonBlue
 import com.tube_hunter.frontend.ui.theme.WhiteFoam
 import com.tube_hunter.frontend.ui.theme.quicksand
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 @Composable
 fun NewSpotScreen(navController: NavController, viewModel: NewSpotViewModel = viewModel()) {
@@ -127,7 +123,8 @@ fun NewSpotScreen(navController: NavController, viewModel: NewSpotViewModel = vi
 
             NewSpotCard(
                 formState = formState,
-                onFormChange = { formState = it }
+                onFormChange = { formState = it },
+                viewModel = viewModel
             )
 
             Spacer(modifier = Modifier.weight(1f))
@@ -184,7 +181,8 @@ fun NewSpotScreen(navController: NavController, viewModel: NewSpotViewModel = vi
 @Composable
 fun NewSpotCard(
     formState: SpotFormState,
-    onFormChange: (SpotFormState) -> Unit
+    onFormChange: (SpotFormState) -> Unit,
+    viewModel: NewSpotViewModel
 ) {
     Card(
         modifier = Modifier
@@ -348,7 +346,8 @@ fun NewSpotCard(
                     endDate = formState.seasonEnd,
                     onValueChange = { start, end ->
                         onFormChange(formState.copy(seasonStart = start, seasonEnd = end))
-                    }
+                    },
+                    viewModel = viewModel
                 )
             }
         }
@@ -534,7 +533,8 @@ fun DatePickerModal(onDateSelected: (Long?) -> Unit, onDismiss: () -> Unit) {
 fun SeasonDatePicker(
     startDate: Long?,
     endDate: Long?,
-    onValueChange: (Long?, Long?) -> Unit
+    onValueChange: (Long?, Long?) -> Unit,
+    viewModel: NewSpotViewModel
 ) {
     var startDatePicker by remember { mutableStateOf(false) }
     var endDatePicker by remember { mutableStateOf(false) }
@@ -554,7 +554,7 @@ fun SeasonDatePicker(
             Text(
                 modifier = Modifier.padding(12.dp),
                 textAlign = TextAlign.Center,
-                text = startDate?.let { formatDateFromMillis(it) } ?: "Start",
+                text = startDate?.let { viewModel.formatDateFromMillis(it) } ?: "Start",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = WhiteFoam,
@@ -579,7 +579,7 @@ fun SeasonDatePicker(
             Text(
                 modifier = Modifier.padding(12.dp),
                 textAlign = TextAlign.Center,
-                text = endDate?.let { formatDateFromMillis(it) } ?: "End",
+                text = endDate?.let { viewModel.formatDateFromMillis(it) } ?: "End",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = WhiteFoam,
@@ -608,12 +608,4 @@ fun SeasonDatePicker(
             onDismiss = { endDatePicker = false }
         )
     }
-}
-
-// ----------- A METTRE DANS VIEWMODEL ? -----------
-
-fun formatDateFromMillis(millis: Long): String {
-    val date = Date(millis)
-    val formatter = SimpleDateFormat("dd MMM", Locale.getDefault())
-    return formatter.format(date)
 }

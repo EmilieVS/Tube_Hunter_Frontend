@@ -16,6 +16,9 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 data class SpotFormState(
     val imageUri: Uri? = null,
@@ -90,7 +93,7 @@ class NewSpotViewModel : ViewModel() {
                 val response = ApiClient.api.addSpot(spotRequest)
                 val jsonString = Gson().toJson(response)
                 val json = JSONObject(jsonString)
-                _uiMessage.value = json.optString("message") //spot added successfuly
+                _uiMessage.value = json.optString("message") //spot added successfully
                 _isSuccess.value = true
 
             } catch (e: retrofit2.HttpException) {
@@ -100,9 +103,15 @@ class NewSpotViewModel : ViewModel() {
                 _isSuccess.value = false
 
             } catch (e: Exception) {
-                _uiMessage.value = e.message //servor error
+                _uiMessage.value = e.message //server error
                 _isSuccess.value = false
             }
         }
+    }
+
+    fun formatDateFromMillis(millis: Long): String {
+        val date = Date(millis)
+        val formatter = SimpleDateFormat("dd MMM", Locale.getDefault())
+        return formatter.format(date)
     }
 }

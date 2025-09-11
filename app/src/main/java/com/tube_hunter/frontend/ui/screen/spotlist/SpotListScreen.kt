@@ -439,7 +439,6 @@ fun CountrySearchFilter(
     }
 }
 
-
 @Composable
 fun IconDifficulty(rating: Int) {
     Row {
