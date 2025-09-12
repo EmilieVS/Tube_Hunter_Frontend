@@ -18,7 +18,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -31,8 +35,11 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.SearchBar
+import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -43,10 +50,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -81,6 +90,8 @@ fun SpotListScreen(
 
     val selectedDifficulty by viewModel.selectedDifficulty.collectAsState(initial = null)
     val selectedSurfBreak by viewModel.selectedSurfBreak.collectAsState(initial = null)
+    val countryQuery by viewModel.countryQuery.collectAsState()
+    val filteredCountries by viewModel.filteredCountries.collectAsState()
 
     LaunchedEffect(snackbarMessage) {
         if (snackbarMessage.isNotBlank()) {
@@ -152,6 +163,8 @@ fun SpotListScreen(
                     FilterDialog(
                         selectedDifficulty = selectedDifficulty,
                         selectedSurfBreak = selectedSurfBreak,
+                        countryQuery = countryQuery,
+                        filteredCountries = filteredCountries,
                         onDifficultyChange = { viewModel.setDifficulty(it) },
                         onSurfBreakChange = { viewModel.setSurfBreak(it) },
                         onDismiss = { showFilterDialog = false },
@@ -281,6 +294,8 @@ fun SpotCard(spot: SpotDetailsUi, onClick: () -> Unit) {
 fun FilterDialog(
     selectedDifficulty: Int?,
     selectedSurfBreak: String?,
+    countryQuery: String,
+    filteredCountries:List<String>,
     onDifficultyChange: (Int?) -> Unit,
     onSurfBreakChange: (String?) -> Unit,
     onDismiss: () -> Unit,
@@ -288,8 +303,6 @@ fun FilterDialog(
     onClear: () -> Unit,
     viewModel: SpotListViewModel
 ) {
-    val countryQuery by viewModel.countryQuery.collectAsState()
-    val suggestions by viewModel.filteredCountries.collectAsState()
 
     AlertDialog(
         containerColor = WhiteFoam,
@@ -299,11 +312,10 @@ fun FilterDialog(
         title = { Text("Filter Spots") },
         text = {
             Column {
-                CountrySearchFilter(
-                    query = countryQuery,
-                    suggestions = suggestions,
-                    onQueryChanged = { viewModel.onCountryQueryChanged(it) },
-                    onCountrySelected = { viewModel.onCountrySelected(it) }
+                CountrySearchBar(
+                    textFieldState = rememberTextFieldState(countryQuery),
+                    onSearch = { query -> viewModel.onSearch(query) },
+                    searchResults = filteredCountries
                 )
 
                 Spacer(Modifier.height(16.dp))
@@ -380,91 +392,48 @@ fun FilterDialog(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchBar(){
-    DockedSearchBar(
-        inputField = {
-            SearchBarDefaults.InputField(
-                query = query,
-                onQueryChange = onQueryChange,
-                onSearch = onSearch,
-                expanded = active,
-                onExpandedChange = onActiveChange,
-                enabled = enabled,
-                placeholder = placeholder,
-                leadingIcon = leadingIcon,
-                trailingIcon = trailingIcon,
-                colors = colors.inputFieldColors,
-                interactionSource = interactionSource,
-            )
-        },
-        expanded = active,
-        onExpandedChange = onActiveChange,
-        modifier = modifier,
-        shape = shape,
-        colors = colors,
-        tonalElevation = tonalElevation,
-        shadowElevation = shadowElevation,
-        content = content,
-    )
-}
-@Composable
-fun CountrySearchFilter(
-    query: String,
-    suggestions: List<String>,
-    onQueryChanged: (String) -> Unit,
-    onCountrySelected: (String) -> Unit
+fun CountrySearchBar(
+    textFieldState: TextFieldState,
+    onSearch: (String) ->Unit,
+    searchResults: List<String>
 ) {
-    var expanded by remember { mutableStateOf(false) }
+    // Controls expansion state of the search bar
+    var expanded by rememberSaveable { mutableStateOf(false) }
 
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Text(
-            "Country",
-            fontSize = 16.sp
-        )
-
-        Spacer(Modifier.height(8.dp))
-
-        OutlinedTextField(
-            value = query,
-            onValueChange = {
-                onQueryChanged(it)
-                expanded = it.isNotBlank()
-            },
-            placeholder = {
-                Text(
-                    "Type a country",
-                    color = DeepBlue
-                )
-            },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = DeepBlue,
-                unfocusedBorderColor = DeepBlue,
-                focusedContainerColor = WhiteFoam,
-                unfocusedContainerColor = WhiteFoam,
-                focusedTextColor = DeepBlue,
-                unfocusedTextColor = DeepBlue,
-                cursorColor = DeepBlue
-            ),
-            shape = RoundedCornerShape(8.dp)
-        )
-
-        DropdownMenu(
-            expanded = expanded && suggestions.isNotEmpty(),
-            onDismissRequest = { expanded = false },
+    Box{
+        SearchBar(
             modifier = Modifier
-                .fillMaxWidth(0.6f)
-                .background(WhiteFoam),
-        ) {
-            suggestions.forEach { country ->
-                DropdownMenuItem(
-                    text = { Text(country) },
-                    onClick = {
-                        onCountrySelected(country)
+                .align(Alignment.TopCenter),
+            inputField = {
+                SearchBarDefaults.InputField(
+                    query = textFieldState.text.toString(),
+                    onQueryChange = { textFieldState.edit { replace(0, length, it) } },
+                    onSearch = {
+                        onSearch(textFieldState.text.toString())
                         expanded = false
-                    }
+                    },
+                    expanded = expanded,
+                    onExpandedChange = { expanded = it },
+                    placeholder = { Text("Search") }
                 )
+            },
+            expanded = expanded,
+            onExpandedChange = { expanded = it },
+        ) {
+            // Display search results in a scrollable column
+            Column(Modifier.verticalScroll(rememberScrollState())) {
+                searchResults.forEach { result ->
+                    ListItem(
+                        headlineContent = { Text(result) },
+                        modifier = Modifier
+                            .clickable {
+                                textFieldState.edit { replace(0, length, result) }
+                                expanded = false
+                            }
+                            .fillMaxWidth()
+                            .fillMaxHeight(0.8f)
+                    )
+                }
             }
         }
     }

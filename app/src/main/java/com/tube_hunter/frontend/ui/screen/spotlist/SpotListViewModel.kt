@@ -1,6 +1,8 @@
 package com.tube_hunter.frontend.ui.screen.spotlist
 
 import android.util.Log
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tube_hunter.frontend.data.api.ApiClient
@@ -54,15 +56,15 @@ class SpotListViewModel : ViewModel() {
     private val _selectedSurfBreak = MutableStateFlow<String?>(null)
     val selectedSurfBreak: StateFlow<String?> = _selectedSurfBreak
 
-    private val _selectedCountry = MutableStateFlow<String?>(null)
-    val selectedCountry: StateFlow<String?> = _selectedCountry
+    val allCountries: StateFlow<List<String>> = _spots
+        .map { spots -> spots.map { it.country }.distinct() }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     private val _countryQuery = MutableStateFlow("")
     val countryQuery: StateFlow<String> = _countryQuery
 
-    val allCountries: StateFlow<List<String>> = _spots
-        .map { spots -> spots.map { it.country }.distinct() }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+    private val _selectedCountry = MutableStateFlow<String?>(null)
+    val selectedCountry: StateFlow<String?> = _selectedCountry
 
     val filteredCountries: StateFlow<List<String>> =
         combine(_countryQuery, allCountries) { query, countries ->
@@ -73,13 +75,8 @@ class SpotListViewModel : ViewModel() {
             }
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    fun onCountryQueryChanged(query: String) {
+    fun onSearch(query: String) {
         _countryQuery.value = query
-    }
-
-    fun onCountrySelected(country: String) {
-        _selectedCountry.value = country
-        _countryQuery.value = country
     }
 
     fun setDifficulty(level: Int?) {
