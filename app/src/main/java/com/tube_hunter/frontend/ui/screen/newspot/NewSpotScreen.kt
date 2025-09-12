@@ -2,8 +2,9 @@
 
 package com.tube_hunter.frontend.ui.screen.newspot
 
-import com.tube_hunter.frontend.ui.navigation.Screen
-import androidx.compose.material3.ExperimentalMaterial3Api
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -33,8 +34,8 @@ import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -43,8 +44,6 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
@@ -58,8 +57,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -67,21 +66,19 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.tube_hunter.frontend.R
 import com.tube_hunter.frontend.ui.component.BrandTitle
-import com.tube_hunter.frontend.ui.screen.spotlist.SpotListViewModel
+import com.tube_hunter.frontend.ui.navigation.Screen
 import com.tube_hunter.frontend.ui.theme.DeepBlue
 import com.tube_hunter.frontend.ui.theme.LagoonBlue
 import com.tube_hunter.frontend.ui.theme.WhiteFoam
 import com.tube_hunter.frontend.ui.theme.quicksand
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 @Composable
-fun NewSpotScreen(onNavigate: (String) -> Unit, viewModel: NewSpotViewModel = viewModel()) {
+fun NewSpotScreen(navController: NavController, viewModel: NewSpotViewModel = viewModel()) {
     var formState by remember { mutableStateOf(SpotFormState()) }
     val uiMessage by viewModel.uiMessage.collectAsState()
     val isSuccess by viewModel.isSuccess.collectAsState()
@@ -97,7 +94,9 @@ fun NewSpotScreen(onNavigate: (String) -> Unit, viewModel: NewSpotViewModel = vi
     }
     LaunchedEffect(isSuccess) {
         if (isSuccess) {
-            onNavigate(Screen.SpotList.route + "?message=✅ Spot added successfully")
+            navController.navigate(Screen.SpotList.route + "?message=✅ Spot added successfully") {
+                popUpTo(Screen.SpotList.route) { inclusive = true }
+            }
         }
     }
 
@@ -124,7 +123,8 @@ fun NewSpotScreen(onNavigate: (String) -> Unit, viewModel: NewSpotViewModel = vi
 
             NewSpotCard(
                 formState = formState,
-                onFormChange = { formState = it }
+                onFormChange = { formState = it },
+                viewModel = viewModel
             )
 
             Spacer(modifier = Modifier.weight(1f))
@@ -132,7 +132,7 @@ fun NewSpotScreen(onNavigate: (String) -> Unit, viewModel: NewSpotViewModel = vi
             Row {
                 Button(
                     onClick = {
-                        onNavigate(Screen.SpotList.route)
+                        navController.popBackStack()
                     },
                     colors = ButtonDefaults.buttonColors(WhiteFoam, DeepBlue),
                     modifier = Modifier.padding(bottom = 48.dp)
@@ -146,10 +146,10 @@ fun NewSpotScreen(onNavigate: (String) -> Unit, viewModel: NewSpotViewModel = vi
                 }
 
                 Spacer(modifier = Modifier.width(16.dp))
-
+                val context =   LocalContext.current
                 Button(
                     onClick = {
-                        viewModel.sendSpot(formState)
+                        viewModel.sendSpot(context,formState)
                     },
                     enabled = formState.isValid(),
                     colors = ButtonDefaults.buttonColors(
@@ -181,7 +181,8 @@ fun NewSpotScreen(onNavigate: (String) -> Unit, viewModel: NewSpotViewModel = vi
 @Composable
 fun NewSpotCard(
     formState: SpotFormState,
-    onFormChange: (SpotFormState) -> Unit
+    onFormChange: (SpotFormState) -> Unit,
+    viewModel: NewSpotViewModel
 ) {
     Card(
         modifier = Modifier
@@ -197,8 +198,8 @@ fun NewSpotCard(
             horizontalAlignment = Alignment.Start
         ) {
             AddImage(
-                imageUrl = formState.imageUrl,
-                onImageChange = { onFormChange(formState.copy(imageUrl = it)) }
+                imageUri = formState.imageUri,
+                onImageChange = { onFormChange(formState.copy(imageUri = it)) }
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -345,7 +346,8 @@ fun NewSpotCard(
                     endDate = formState.seasonEnd,
                     onValueChange = { start, end ->
                         onFormChange(formState.copy(seasonStart = start, seasonEnd = end))
-                    }
+                    },
+                    viewModel = viewModel
                 )
             }
         }
@@ -354,11 +356,14 @@ fun NewSpotCard(
 
 @Composable
 fun AddImage(
-    imageUrl: String,
-    onImageChange: (String) -> Unit
+    imageUri: Uri?,
+    onImageChange: (Uri?) -> Unit
 ) {
-    var userInput by remember { mutableStateOf(false) }
-    var inputText by remember { mutableStateOf("") }
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        onImageChange(uri)
+    }
 
     Box(
         modifier = Modifier
@@ -366,72 +371,28 @@ fun AddImage(
             .height(180.dp)
             .clip(RoundedCornerShape(12.dp))
             .background(LagoonBlue)
-            .clickable { userInput = true },
+            .clickable { launcher.launch("image/*") },
         contentAlignment = Alignment.Center
     ) {
-        if (imageUrl.isNotBlank()) {
+        if (imageUri != null) {
             AsyncImage(
-                model = imageUrl,
+                model = imageUri,
                 contentDescription = "Spot image",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(8.dp))
-                    .height(180.dp),
+                modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(8.dp)),
                 contentScale = ContentScale.Crop
             )
         } else {
-            if (userInput) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    TextField(
-                        value = inputText,
-                        onValueChange = { inputText = it },
-                        placeholder = { Text("Insert your image URL") },
-                        colors = TextFieldDefaults.colors(
-                            focusedContainerColor = WhiteFoam,
-                            unfocusedContainerColor = WhiteFoam,
-                            focusedLabelColor = DeepBlue,
-                            unfocusedLabelColor = DeepBlue,
-                            focusedTextColor = DeepBlue,
-                            unfocusedTextColor = DeepBlue,
-                            cursorColor = DeepBlue
-                        ),
-                        modifier = Modifier
-                            .fillMaxWidth(0.8f)
-                            .background(Color.White, RoundedCornerShape(8.dp))
-                    )
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    Button(
-                        onClick = {
-                            onImageChange(inputText.trim())
-                            userInput = false
-                        },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = WhiteFoam,
-                            contentColor = DeepBlue
-                        )
-                    ) {
-                        Text("Confirm")
-                    }
-                }
-            } else {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Icon(
-                        imageVector = Icons.Default.PhotoCamera,
-                        contentDescription = "Add Image",
-                        tint = WhiteFoam,
-                        modifier = Modifier.size(48.dp)
-                    )
-                    Text(
-                        text = if (imageUrl.isNotBlank()) imageUrl else "Add image",
-                        color = WhiteFoam,
-                        fontFamily = quicksand,
-                        fontSize = 16.sp,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(top = 8.dp)
-                    )
-                }
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Icon(
+                    imageVector = Icons.Default.PhotoCamera,
+                    contentDescription = "Add Image",
+                    tint = WhiteFoam,
+                    modifier = Modifier.size(48.dp)
+                )
+                Text(
+                    text = "Add image",
+                    color = WhiteFoam
+                )
             }
         }
     }
@@ -572,7 +533,8 @@ fun DatePickerModal(onDateSelected: (Long?) -> Unit, onDismiss: () -> Unit) {
 fun SeasonDatePicker(
     startDate: Long?,
     endDate: Long?,
-    onValueChange: (Long?, Long?) -> Unit
+    onValueChange: (Long?, Long?) -> Unit,
+    viewModel: NewSpotViewModel
 ) {
     var startDatePicker by remember { mutableStateOf(false) }
     var endDatePicker by remember { mutableStateOf(false) }
@@ -592,7 +554,7 @@ fun SeasonDatePicker(
             Text(
                 modifier = Modifier.padding(12.dp),
                 textAlign = TextAlign.Center,
-                text = startDate?.let { formatDateFromMillis(it) } ?: "Start",
+                text = startDate?.let { viewModel.formatDateFromMillis(it) } ?: "Start",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = WhiteFoam,
@@ -617,7 +579,7 @@ fun SeasonDatePicker(
             Text(
                 modifier = Modifier.padding(12.dp),
                 textAlign = TextAlign.Center,
-                text = endDate?.let { formatDateFromMillis(it) } ?: "End",
+                text = endDate?.let { viewModel.formatDateFromMillis(it) } ?: "End",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = WhiteFoam,
@@ -646,12 +608,4 @@ fun SeasonDatePicker(
             onDismiss = { endDatePicker = false }
         )
     }
-}
-
-// ----------- A METTRE DANS VIEWMODEL ? -----------
-
-fun formatDateFromMillis(millis: Long): String {
-    val date = Date(millis)
-    val formatter = SimpleDateFormat("dd MMM", Locale.getDefault())
-    return formatter.format(date)
 }

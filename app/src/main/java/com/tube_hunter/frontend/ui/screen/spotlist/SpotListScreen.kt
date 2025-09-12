@@ -24,11 +24,15 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.DockedSearchBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -64,26 +68,27 @@ import com.tube_hunter.frontend.ui.theme.quicksand
 import kotlinx.coroutines.launch
 
 @Composable
-fun SpotListScreen(onNavigate: (String) -> Unit, snackbarMessage: String = "", viewModel: SpotListViewModel = viewModel()) {
-    val spots by viewModel.spots.collectAsState()
-    var filteredSpots by remember { mutableStateOf<List<SpotDetailsUi>>(emptyList()) }
+fun SpotListScreen(
+    onNavigate: (String) -> Unit,
+    snackbarMessage: String = "",
+    viewModel: SpotListViewModel = viewModel()
+) {
+    val filteredSpots by viewModel.filteredSpots.collectAsState()
+
     var showFilterDialog by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
+
+    val selectedDifficulty by viewModel.selectedDifficulty.collectAsState(initial = null)
+    val selectedSurfBreak by viewModel.selectedSurfBreak.collectAsState(initial = null)
 
     LaunchedEffect(snackbarMessage) {
         if (snackbarMessage.isNotBlank()) {
             coroutineScope.launch {
                 snackbarHostState.showSnackbar(snackbarMessage)
+                onNavigate(Screen.SpotList.route)
             }
         }
-    }
-
-    val selectedDifficulty by viewModel.selectedDifficulty.collectAsState()
-    val selectedSurfBreak by viewModel.selectedSurfBreak.collectAsState()
-
-    LaunchedEffect(spots) {
-        filteredSpots = spots
     }
 
     Box(
@@ -113,15 +118,16 @@ fun SpotListScreen(onNavigate: (String) -> Unit, snackbarMessage: String = "", v
                         .padding(16.dp)
                         .fillMaxWidth(0.8f),
                     contentAlignment = Alignment.Center
-                ){
-                    Text(text = "No result",
+                ) {
+                    Text(
+                        text = "No result",
                         color = DeepBlue,
                         fontFamily = quicksand,
                         fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold)
+                        fontWeight = FontWeight.Bold
+                    )
                 }
             }
-
             SpotList(filteredSpots, onNavigate)
 
             Spacer(modifier = Modifier.weight(1f))
@@ -150,18 +156,15 @@ fun SpotListScreen(onNavigate: (String) -> Unit, snackbarMessage: String = "", v
                         onSurfBreakChange = { viewModel.setSurfBreak(it) },
                         onDismiss = { showFilterDialog = false },
                         onConfirm = { difficulty, surfBreak ->
-                            filteredSpots = spots.filter { spot ->
-                                val difficultyMatch = difficulty == null || spot.difficulty == difficulty
-                                val surfBreakMatch = surfBreak == null || spot.surfBreaks.contains(surfBreak)
-                                difficultyMatch && surfBreakMatch
-                            }
+                            viewModel.setDifficulty(difficulty)
+                            viewModel.setSurfBreak(surfBreak)
                             showFilterDialog = false
                         },
                         onClear = {
                             viewModel.clearFilters()
-                            filteredSpots = spots
                             showFilterDialog = false
-                        }
+                        },
+                        viewModel = viewModel
                     )
                 }
 
@@ -282,8 +285,12 @@ fun FilterDialog(
     onSurfBreakChange: (String?) -> Unit,
     onDismiss: () -> Unit,
     onConfirm: (Int?, String?) -> Unit,
-    onClear: () -> Unit
+    onClear: () -> Unit,
+    viewModel: SpotListViewModel
 ) {
+    val countryQuery by viewModel.countryQuery.collectAsState()
+    val suggestions by viewModel.filteredCountries.collectAsState()
+
     AlertDialog(
         containerColor = WhiteFoam,
         textContentColor = DeepBlue,
@@ -292,7 +299,19 @@ fun FilterDialog(
         title = { Text("Filter Spots") },
         text = {
             Column {
-                Text("Difficulty")
+                CountrySearchFilter(
+                    query = countryQuery,
+                    suggestions = suggestions,
+                    onQueryChanged = { viewModel.onCountryQueryChanged(it) },
+                    onCountrySelected = { viewModel.onCountrySelected(it) }
+                )
+
+                Spacer(Modifier.height(16.dp))
+
+                Text(
+                    "Difficulty",
+                    fontSize = 16.sp
+                )
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     (1..5).forEach { level ->
                         FilterChip(
@@ -312,8 +331,11 @@ fun FilterDialog(
 
                 Spacer(Modifier.height(16.dp))
 
-                Text("Surf Break")
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    "Surf Break",
+                    fontSize = 16.sp
+                )
+                Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                     listOf("Point", "Beach", "Reef").forEach { type ->
                         FilterChip(
                             selected = selectedSurfBreak == type,
@@ -336,7 +358,10 @@ fun FilterDialog(
                 onClick = { onConfirm(selectedDifficulty, selectedSurfBreak) },
                 colors = ButtonDefaults.buttonColors(LagoonBlue, WhiteFoam)
             ) {
-                Text("Confirm")
+                Text(
+                    "Confirm",
+                    fontSize = 16.sp
+                )
             }
         },
         dismissButton = {
@@ -344,7 +369,10 @@ fun FilterDialog(
                 onClick = { onClear() },
                 colors = ButtonDefaults.buttonColors(LagoonBlue, WhiteFoam)
             ) {
-                Text("Clear")
+                Text(
+                    "Clear",
+                    fontSize = 16.sp
+                )
             }
         }
     )
@@ -379,7 +407,68 @@ fun SearchBar(){
         content = content,
     )
 }
+@Composable
+fun CountrySearchFilter(
+    query: String,
+    suggestions: List<String>,
+    onQueryChanged: (String) -> Unit,
+    onCountrySelected: (String) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
 
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            "Country",
+            fontSize = 16.sp
+        )
+
+        Spacer(Modifier.height(8.dp))
+
+        OutlinedTextField(
+            value = query,
+            onValueChange = {
+                onQueryChanged(it)
+                expanded = it.isNotBlank()
+            },
+            placeholder = {
+                Text(
+                    "Type a country",
+                    color = DeepBlue
+                )
+            },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true,
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = DeepBlue,
+                unfocusedBorderColor = DeepBlue,
+                focusedContainerColor = WhiteFoam,
+                unfocusedContainerColor = WhiteFoam,
+                focusedTextColor = DeepBlue,
+                unfocusedTextColor = DeepBlue,
+                cursorColor = DeepBlue
+            ),
+            shape = RoundedCornerShape(8.dp)
+        )
+
+        DropdownMenu(
+            expanded = expanded && suggestions.isNotEmpty(),
+            onDismissRequest = { expanded = false },
+            modifier = Modifier
+                .fillMaxWidth(0.6f)
+                .background(WhiteFoam),
+        ) {
+            suggestions.forEach { country ->
+                DropdownMenuItem(
+                    text = { Text(country) },
+                    onClick = {
+                        onCountrySelected(country)
+                        expanded = false
+                    }
+                )
+            }
+        }
+    }
+}
 
 @Composable
 fun IconDifficulty(rating: Int) {

@@ -1,6 +1,8 @@
 package com.tube_hunter.frontend.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -11,6 +13,7 @@ import com.tube_hunter.frontend.ui.screen.newspot.NewSpotScreen
 import com.tube_hunter.frontend.ui.screen.home.HomeScreen
 import com.tube_hunter.frontend.ui.screen.spotdetails.SpotDetailsScreen
 import com.tube_hunter.frontend.ui.screen.spotlist.SpotListScreen
+import com.tube_hunter.frontend.ui.screen.spotlist.SpotListViewModel
 
 sealed class Screen(val route: String) {
     object Home : Screen("home")
@@ -38,9 +41,15 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
             arguments = listOf(navArgument("message") { defaultValue = "" })
         ) { backStackEntry ->
             val message = backStackEntry.arguments?.getString("message") ?: ""
+            val parentEntry = remember(backStackEntry) {
+                navController.getBackStackEntry(Screen.SpotList.route)
+            }
+            val viewModel: SpotListViewModel = viewModel(parentEntry)
+
             SpotListScreen(
                 onNavigate = { route -> navController.navigate(route) },
-                snackbarMessage = message
+                snackbarMessage = message,
+                viewModel = viewModel
             )
         }
 
@@ -51,17 +60,22 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
                 defaultValue = -1L
             })
         ) { backStackEntry ->
-            val spotId = backStackEntry.arguments?.getLong("spotId") ?: -1L
+            val spotId = backStackEntry.arguments?.getLong("spotId") ?: -1L // we get spotId argument, if missing value = -1L
+            val parentEntry = remember(backStackEntry) {
+                navController.getBackStackEntry(Screen.SpotList.route)
+            }
+            val viewModel: SpotListViewModel = viewModel(parentEntry)
+
             SpotDetailsScreen(
                 spotId = spotId,
-                onNavigate = { route -> navController.navigate(route) }
+                onNavigate = { route -> navController.popBackStack() },
+                viewModel = viewModel
             )
         }
 
-
         composable(Screen.NewSpot.route) {
             NewSpotScreen(
-                onNavigate = { route -> navController.navigate(route) }
+                navController = navController,
             )
         }
     }
