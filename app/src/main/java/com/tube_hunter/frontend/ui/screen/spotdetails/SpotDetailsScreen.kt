@@ -1,5 +1,6 @@
 package com.tube_hunter.frontend.ui.screen.spotdetails
 
+import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,15 +20,19 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import android.net.Uri
+import androidx.compose.foundation.layout.offset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -48,6 +53,14 @@ import java.util.Locale
 fun SpotDetailsScreen(spotId: Long, onNavigate: (String) -> Unit, viewModel: SpotListViewModel = viewModel()) {
     val spots by viewModel.spots.collectAsState()
     val spot = spots.find { it.id == spotId }
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        viewModel.openMapEvent.collect { url ->
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+            context.startActivity(intent)
+        }
+    }
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -71,7 +84,7 @@ fun SpotDetailsScreen(spotId: Long, onNavigate: (String) -> Unit, viewModel: Spo
             Spacer(modifier = Modifier.weight(1f))
 
             spot?.let {
-                SpotDetailsCard(it)
+                SpotDetailsCard(it,viewModel)
             } ?: Text("Spot not found", color = LagoonBlue)
 
             Spacer(modifier = Modifier.weight(1f))
@@ -95,7 +108,8 @@ fun SpotDetailsScreen(spotId: Long, onNavigate: (String) -> Unit, viewModel: Spo
 }
 
 @Composable
-fun SpotDetailsCard(spot: SpotDetailsUi) {
+fun SpotDetailsCard(spot: SpotDetailsUi, viewModel: SpotListViewModel=viewModel()) {
+
     Card(
         modifier = Modifier
             .padding(horizontal = 24.dp)
@@ -135,13 +149,31 @@ fun SpotDetailsCard(spot: SpotDetailsUi) {
 
             Text(
                 text = "${spot.city}, ${spot.country}",
-                fontSize = 16.sp,
+                fontSize = 18.sp,
                 fontStyle = FontStyle.Italic,
                 fontFamily = quicksand,
                 color = DeepBlue
             )
 
-            Spacer(modifier = Modifier.height(48.dp))
+            Button(
+                onClick = {viewModel.findLocation(spot.name, spot.country)
+                },
+                Modifier.offset(-24.dp, y=-4.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = WhiteFoam)
+            ) {
+                Text(
+                    text = "Voir sur la carte",
+                    fontFamily = quicksand,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
+                    color = DeepBlue,
+                    style = androidx.compose.ui.text.TextStyle(
+                        textDecoration = androidx.compose.ui.text.style.TextDecoration.Underline
+                            )
+                )
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -233,11 +265,15 @@ fun SpotDetailsCard(spot: SpotDetailsUi) {
                             fontFamily = quicksand
                         )
                     }
+
                 }
             }
+
         }
+
     }
 }
+
 
 // ----------- VIEWMODEL -----------
 
