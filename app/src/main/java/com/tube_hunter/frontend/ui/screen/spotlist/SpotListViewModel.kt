@@ -108,7 +108,7 @@ class SpotListViewModel : ViewModel() {
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    private val _openMapEvent = MutableSharedFlow<String>() // contient l’URL à ouvrir
+    private val _openMapEvent = MutableSharedFlow<String>() //contains the URL to open
     val openMapEvent = _openMapEvent.asSharedFlow()
 
     fun findLocation(name: String, country: String) {
