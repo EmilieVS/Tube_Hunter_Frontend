@@ -24,16 +24,18 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.DockedSearchBar
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -41,6 +43,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -79,6 +82,7 @@ fun SpotListScreen(
 
     val selectedDifficulty by viewModel.selectedDifficulty.collectAsState(initial = null)
     val selectedSurfBreak by viewModel.selectedSurfBreak.collectAsState(initial = null)
+    val filteredCountries by viewModel.filteredCountries.collectAsState()
 
     LaunchedEffect(snackbarMessage) {
         if (snackbarMessage.isNotBlank()) {
@@ -150,10 +154,11 @@ fun SpotListScreen(
                     FilterDialog(
                         selectedDifficulty = selectedDifficulty,
                         selectedSurfBreak = selectedSurfBreak,
+                        filteredCountries = filteredCountries,
                         onDifficultyChange = { viewModel.setDifficulty(it) },
                         onSurfBreakChange = { viewModel.setSurfBreak(it) },
                         onDismiss = { showFilterDialog = false },
-                        onConfirm = { difficulty, surfBreak ->
+                        onConfirm = { difficulty, surfBreak  ->
                             viewModel.setDifficulty(difficulty)
                             viewModel.setSurfBreak(surfBreak)
                             showFilterDialog = false
@@ -279,6 +284,7 @@ fun SpotCard(spot: SpotDetailsUi, onClick: () -> Unit) {
 fun FilterDialog(
     selectedDifficulty: Int?,
     selectedSurfBreak: String?,
+    filteredCountries:List<String>,
     onDifficultyChange: (Int?) -> Unit,
     onSurfBreakChange: (String?) -> Unit,
     onDismiss: () -> Unit,
@@ -286,8 +292,6 @@ fun FilterDialog(
     onClear: () -> Unit,
     viewModel: SpotListViewModel
 ) {
-    val countryQuery by viewModel.countryQuery.collectAsState()
-    val suggestions by viewModel.filteredCountries.collectAsState()
 
     AlertDialog(
         containerColor = WhiteFoam,
@@ -297,11 +301,10 @@ fun FilterDialog(
         title = { Text("Filter Spots") },
         text = {
             Column {
-                CountrySearchFilter(
-                    query = countryQuery,
-                    suggestions = suggestions,
-                    onQueryChanged = { viewModel.onCountryQueryChanged(it) },
-                    onCountrySelected = { viewModel.onCountrySelected(it) }
+                CountrySearchBar(
+                    onSearch = { query -> viewModel.onSearch(query) },
+                    searchResults = filteredCountries,
+                    viewModel = viewModel,
                 )
 
                 Spacer(Modifier.height(16.dp))
@@ -376,66 +379,67 @@ fun FilterDialog(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CountrySearchFilter(
-    query: String,
-    suggestions: List<String>,
-    onQueryChanged: (String) -> Unit,
-    onCountrySelected: (String) -> Unit
+fun CountrySearchBar(
+    onSearch: (String) -> Unit,
+    searchResults: List<String>,
+    viewModel: SpotListViewModel
 ) {
-    var expanded by remember { mutableStateOf(false) }
+    var expanded by rememberSaveable { mutableStateOf(false) }
+    var query by rememberSaveable { mutableStateOf("") }
 
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Text(
-            "Country",
-            fontSize = 16.sp
-        )
 
-        Spacer(Modifier.height(8.dp))
-
-        OutlinedTextField(
-            value = query,
-            onValueChange = {
-                onQueryChanged(it)
-                expanded = it.isNotBlank()
-            },
-            placeholder = {
-                Text(
-                    "Type a country",
-                    color = DeepBlue
-                )
-            },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = DeepBlue,
-                unfocusedBorderColor = DeepBlue,
-                focusedContainerColor = WhiteFoam,
-                unfocusedContainerColor = WhiteFoam,
-                focusedTextColor = DeepBlue,
-                unfocusedTextColor = DeepBlue,
-                cursorColor = DeepBlue
-            ),
-            shape = RoundedCornerShape(8.dp)
-        )
-
-        DropdownMenu(
-            expanded = expanded && suggestions.isNotEmpty(),
-            onDismissRequest = { expanded = false },
-            modifier = Modifier
-                .fillMaxWidth(0.6f)
-                .background(WhiteFoam),
-        ) {
-            suggestions.forEach { country ->
-                DropdownMenuItem(
-                    text = { Text(country) },
-                    onClick = {
-                        onCountrySelected(country)
+    Box {
+        val onActiveChange: (Boolean) -> Unit = { newExpanded -> expanded = newExpanded }
+        DockedSearchBar(
+            inputField = {
+                SearchBarDefaults.InputField(
+                    query = query,
+                    onQueryChange = { newQuery ->
+                        query = newQuery
+                        onSearch(newQuery)
+                    },
+                    onSearch = { searchQuery ->
+                        onSearch(searchQuery)
                         expanded = false
-                    }
+                    },
+                    expanded = expanded,
+                    onExpandedChange = onActiveChange,
+                    placeholder = { Text("Search", color = WhiteFoam)},
+                    colors = TextFieldDefaults.colors(
+                        focusedTextColor = WhiteFoam,
+                        unfocusedTextColor = WhiteFoam
+                    )
                 )
+            },
+            expanded = expanded,
+            onExpandedChange = onActiveChange,
+            modifier = Modifier.align(Alignment.TopCenter),
+            shape = SearchBarDefaults.dockedShape,
+            colors = SearchBarDefaults.colors(
+                containerColor = LagoonBlue),
+            tonalElevation = SearchBarDefaults.TonalElevation,
+            shadowElevation = SearchBarDefaults.ShadowElevation,
+            content = {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+                    items(searchResults) { result ->
+                        ListItem(
+                            headlineContent = { Text(result, color = WhiteFoam) },
+                            modifier = Modifier.clickable {
+                                query = result
+                                viewModel.selectCountry(result)
+                                expanded = false
+                            },
+                            colors = ListItemDefaults.colors(containerColor = LagoonBlue)
+                        )
+                    }
+                }
             }
-        }
+        )
     }
 }
 
