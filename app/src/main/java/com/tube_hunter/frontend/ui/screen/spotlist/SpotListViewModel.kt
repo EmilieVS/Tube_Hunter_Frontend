@@ -1,5 +1,6 @@
 package com.tube_hunter.frontend.ui.screen.spotlist
 
+import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -7,9 +8,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tube_hunter.frontend.data.api.ApiClient
 import com.tube_hunter.frontend.ui.component.SpotDetailsUi
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -104,4 +107,18 @@ class SpotListViewModel : ViewModel() {
             matchDifficulty && matchSurfBreak && matchCountry
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    private val _openMapEvent = MutableSharedFlow<String>() // contient l’URL à ouvrir
+    val openMapEvent = _openMapEvent.asSharedFlow()
+
+    fun findLocation(name: String, country: String) {
+        val spotLocationQuery = Uri.encode("$name, $country")
+        val mapDirection = "https://www.openstreetmap.org/search?query=$spotLocationQuery"
+
+        viewModelScope.launch {
+            _openMapEvent.emit(mapDirection)
+
+        }
+    }
 }
+
