@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -159,7 +158,7 @@ fun SpotListScreen(
                         onDifficultyChange = { viewModel.setDifficulty(it) },
                         onSurfBreakChange = { viewModel.setSurfBreak(it) },
                         onDismiss = { showFilterDialog = false },
-                        onConfirm = { difficulty, surfBreak ->
+                        onConfirm = { difficulty, surfBreak  ->
                             viewModel.setDifficulty(difficulty)
                             viewModel.setSurfBreak(surfBreak)
                             showFilterDialog = false
@@ -304,7 +303,8 @@ fun FilterDialog(
             Column {
                 CountrySearchBar(
                     onSearch = { query -> viewModel.onSearch(query) },
-                    searchResults = filteredCountries
+                    searchResults = filteredCountries,
+                    viewModel = viewModel,
                 )
 
                 Spacer(Modifier.height(16.dp))
@@ -383,10 +383,12 @@ fun FilterDialog(
 @Composable
 fun CountrySearchBar(
     onSearch: (String) -> Unit,
-    searchResults: List<String>
+    searchResults: List<String>,
+    viewModel: SpotListViewModel
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
     var query by rememberSaveable { mutableStateOf("") }
+
 
     Box {
         val onActiveChange: (Boolean) -> Unit = { newExpanded -> expanded = newExpanded }
@@ -429,7 +431,7 @@ fun CountrySearchBar(
                             headlineContent = { Text(result, color = WhiteFoam) },
                             modifier = Modifier.clickable {
                                 query = result
-                                onSearch(result)
+                                viewModel.selectCountry(result)
                                 expanded = false
                             },
                             colors = ListItemDefaults.colors(containerColor = LagoonBlue)

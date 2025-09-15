@@ -82,6 +82,11 @@ class SpotListViewModel : ViewModel() {
         _countryQuery.value = query
     }
 
+    fun selectCountry(country: String) {
+        _selectedCountry.value = country
+        _countryQuery.value = country // pour refléter le choix dans la barre
+    }
+
     fun setDifficulty(level: Int?) {
         _selectedDifficulty.value = level
     }
