@@ -162,7 +162,7 @@ fun SpotDetailsCard(spot: SpotDetailsUi, viewModel: SpotListViewModel=viewModel(
                 colors = ButtonDefaults.buttonColors(containerColor = WhiteFoam)
             ) {
                 Text(
-                    text = "Voir sur la carte",
+                    text = "See on map",
                     fontFamily = quicksand,
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,
