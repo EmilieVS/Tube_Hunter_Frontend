@@ -14,7 +14,7 @@
 >
 >❔Create an android app. <br>
 >💭 The main goal is to create a user experience. <br>
->👤 The user can search for a surf spot, see the details, filter the results and add a new spot. <br>
+>👤 The user can search for a surf spot, see the details and see the spot on map, filter the results and add a new spot with photos from the gallery. <br>
 >⚠️ This is the frontend part of the project.
 >
 
